@@ -137,3 +137,432 @@ const CAT_META = {
   "halogen": { label:"Halogens", color:"var(--c-halogen)" },
   "noble-gas": { label:"Noble Gases", color:"var(--c-noble)" },
   "unknown": { label:"Unknown Properties", color:"var(--c-unknown)" },
+};
+
+/* ═══════════════════════════════════════════════════════════════════════
+   GRID LAYOUT
+   Maps each element to [col, row] in the 18-column grid
+═══════════════════════════════════════════════════════════════════════ */
+function getGridPos(el) {
+  // Special f-block rows (lanthanides period:9, actinides period:10)
+  if (el.period === 9) {
+    // Ce–Lu → cols 4–17, row 9
+    const idx = el.z - 58; // 0-based
+    return { col: idx + 4, row: 9 };
+  }
+  if (el.period === 10) {
+    const idx = el.z - 90;
+    return { col: idx + 4, row: 10 };
+  }
+  // Standard layout
+  const col = el.group;
+  let row = el.period;
+  // Push f-block gap periods down
+  if (el.period >= 6 && (el.z === 57 || el.z === 89)) {
+    // La and Ac stay in group 3 row 6/7 but also have f-block series below
+  }
+  return { col, row };
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   BUILD LEGEND
+═══════════════════════════════════════════════════════════════════════ */
+let activeFilter = null;
+const legendEl = document.getElementById('legend');
+Object.entries(CAT_META).forEach(([cat, meta]) => {
+  const item = document.createElement('div');
+  item.className = 'legend-item';
+  item.dataset.cat = cat;
+  item.innerHTML = `<span class="legend-dot" style="background:${meta.color}"></span>${meta.label}`;
+  item.addEventListener('click', () => toggleFilter(cat, item));
+  legendEl.appendChild(item);
+});
+
+function toggleFilter(cat, itemEl) {
+  const allTiles = document.querySelectorAll('.element');
+  const allLegend = document.querySelectorAll('.legend-item');
+  if (activeFilter === cat) {
+    // Clear filter
+    activeFilter = null;
+    allTiles.forEach(t => t.classList.remove('dimmed','highlighted'));
+    allLegend.forEach(l => l.classList.remove('active'));
+  } else {
+    activeFilter = cat;
+    allLegend.forEach(l => l.classList.remove('active'));
+    itemEl.classList.add('active');
+    allTiles.forEach(t => {
+      if (t.dataset.cat === cat) {
+        t.classList.remove('dimmed'); t.classList.add('highlighted');
+      } else {
+        t.classList.add('dimmed'); t.classList.remove('highlighted');
+      }
+    });
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   BUILD PERIODIC GRID
+═══════════════════════════════════════════════════════════════════════ */
+const grid = document.getElementById('periodicGrid');
+
+// Separator row spacer for lanthanides/actinides
+// We use grid-row: 8 for gap label, 9 for lanthanides, 10 for actinides
+// Row 8 is period 7, so we need a visual gap row.
+
+ELEMENTS.forEach((el, idx) => {
+  const tile = document.createElement('div');
+  tile.className = 'element';
+  tile.dataset.z = el.z;
+  tile.dataset.cat = el.cat;
+
+  const catColor = `var(--c-${el.cat.replace('noble-gas','noble').replace('post-trans','post-trans')})`;
+  const colorMap = {
+    "alkali": "var(--c-alkali)",
+    "alkaline": "var(--c-alkaline)",
+    "lanthanide": "var(--c-lanthanide)",
+    "actinide": "var(--c-actinide)",
+    "transition": "var(--c-transition)",
+    "post-trans": "var(--c-post-trans)",
+    "metalloid": "var(--c-metalloid)",
+    "nonmetal": "var(--c-nonmetal)",
+    "halogen": "var(--c-halogen)",
+    "noble-gas": "var(--c-noble)",
+    "unknown": "var(--c-unknown)",
+  };
+  tile.style.setProperty('--cat-color', colorMap[el.cat] || 'rgba(255,255,255,0.2)');
+
+  // Staggered animation
+  tile.style.animationDelay = `${0.008 * idx}s`;
+
+  tile.innerHTML = `
+    <span class="el-number">${el.z}</span>
+    <span class="el-symbol">${el.sym}</span>
+    <span class="el-name">${el.name}</span>
+    <span class="el-mass">${el.mass}</span>
+  `;
+
+  // Grid positioning
+  const pos = getGridPos(el);
+  tile.style.gridColumn = pos.col;
+  tile.style.gridRow = pos.row;
+
+  // Tooltip
+  tile.addEventListener('mouseenter', e => showTooltip(e, el));
+  tile.addEventListener('mouseleave', hideTooltip);
+  tile.addEventListener('mousemove', moveTooltip);
+
+  // Click → open modal
+  tile.addEventListener('click', () => openModal(el));
+
+  grid.appendChild(tile);
+});
+
+// Label tiles for lanthanide/actinide rows
+function makeRowLabel(text, col, row) {
+  const label = document.createElement('div');
+  label.style.gridColumn = `${col}`;
+  label.style.gridRow = `${row}`;
+  label.style.display = 'flex';
+  label.style.alignItems = 'center';
+  label.style.justifyContent = 'flex-end';
+  label.style.paddingRight = '6px';
+  label.style.fontSize = '9px';
+  label.style.color = 'var(--text-muted)';
+  label.style.letterSpacing = '0.4px';
+  label.style.textTransform = 'uppercase';
+  label.style.fontWeight = '500';
+  label.textContent = text;
+  grid.appendChild(label);
+}
+makeRowLabel('Ln', 3, 9);
+makeRowLabel('An', 3, 10);
+
+/* ═══════════════════════════════════════════════════════════════════════
+   TOOLTIP
+═══════════════════════════════════════════════════════════════════════ */
+const tooltip = document.getElementById('tooltip');
+let tooltipVisible = false;
+
+function showTooltip(e, el) {
+  tooltip.textContent = `${el.name} — ${CAT_META[el.cat]?.label || el.cat}`;
+  tooltip.classList.add('show');
+  tooltipVisible = true;
+}
+function hideTooltip() {
+  tooltip.classList.remove('show');
+  tooltipVisible = false;
+}
+function moveTooltip(e) {
+  if (!tooltipVisible) return;
+  tooltip.style.left = `${e.clientX}px`;
+  tooltip.style.top = `${e.clientY}px`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   SEARCH
+═══════════════════════════════════════════════════════════════════════ */
+document.getElementById('searchInput').addEventListener('input', function() {
+  const q = this.value.toLowerCase().trim();
+  const tiles = document.querySelectorAll('.element');
+  if (!q) {
+    tiles.forEach(t => t.classList.remove('dimmed','highlighted'));
+    return;
+  }
+  tiles.forEach(t => {
+    const z = parseInt(t.dataset.z);
+    const el = ELEMENTS[z - 1];
+    const match = el.name.toLowerCase().includes(q) || el.sym.toLowerCase().includes(q) || String(el.z) === q;
+    if (match) {
+      t.classList.remove('dimmed'); t.classList.add('highlighted');
+    } else {
+      t.classList.add('dimmed'); t.classList.remove('highlighted');
+    }
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════════════════════════════════ */
+const overlay = document.getElementById('modalOverlay');
+const detailPanel = document.getElementById('modalDetail');
+const closeBtn = document.getElementById('modalClose');
+let threeRenderer, threeScene, threeCamera, threeAnimId;
+let isDragging = false, prevMouse = {x:0,y:0}, atomGroup;
+
+function openModal(el) {
+  // Build detail panel
+  const colorMap = {
+    "alkali":"var(--c-alkali)","alkaline":"var(--c-alkaline)",
+    "lanthanide":"var(--c-lanthanide)","actinide":"var(--c-actinide)",
+    "transition":"var(--c-transition)","post-trans":"var(--c-post-trans)",
+    "metalloid":"var(--c-metalloid)","nonmetal":"var(--c-nonmetal)",
+    "halogen":"var(--c-halogen)","noble-gas":"var(--c-noble)","unknown":"var(--c-unknown)"
+  };
+  const catColor = colorMap[el.cat] || 'rgba(255,255,255,0.5)';
+  const stateClass = { solid:'state-solid', liquid:'state-liquid', gas:'state-gas', unknown:'state-unknown' }[el.state] || 'state-unknown';
+  const stateIcon = { solid:'⬛', liquid:'💧', gas:'💨', unknown:'?' }[el.state] || '?';
+  const discovery = el.year ? `${el.year}` : 'Ancient / Unknown';
+
+  detailPanel.innerHTML = `
+    <div class="detail-category" style="color:${catColor}">${CAT_META[el.cat]?.label || el.cat}</div>
+    <div class="detail-symbol-row">
+      <span class="detail-symbol">${el.sym}</span>
+      <span class="detail-number">#${el.z}</span>
+    </div>
+    <div class="detail-name">${el.name}</div>
+    <div class="detail-divider"></div>
+    <div class="detail-grid">
+      <div class="detail-field">
+        <span class="detail-label">Atomic Mass</span>
+        <span class="detail-value">${el.mass} u</span>
+      </div>
+      <div class="detail-field">
+        <span class="detail-label">Year Discovered</span>
+        <span class="detail-value">${discovery}</span>
+      </div>
+      <div class="detail-field full">
+        <span class="detail-label">Electron Configuration</span>
+        <span class="detail-value mono">${el.config}</span>
+      </div>
+      <div class="detail-field">
+        <span class="detail-label">State (Room Temp)</span>
+        <span class="detail-value"><span class="state-badge ${stateClass}">${stateIcon} ${el.state.charAt(0).toUpperCase()+el.state.slice(1)}</span></span>
+      </div>
+      <div class="detail-field">
+        <span class="detail-label">Group / Period</span>
+        <span class="detail-value">${el.group ? 'Group '+el.group : 'f-block'} · Period ${el.period <= 8 ? el.period : el.period === 9 ? 6 : 7}</span>
+      </div>
+    </div>
+  `;
+
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  // Init Three.js after modal is visible
+  requestAnimationFrame(() => buildAtomScene(el));
+}
+
+function closeModal() {
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+  destroyThree();
+}
+
+closeBtn.addEventListener('click', closeModal);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+/* ═══════════════════════════════════════════════════════════════════════
+   THREE.JS ATOMIC VISUALISATION
+═══════════════════════════════════════════════════════════════════════ */
+function destroyThree() {
+  if (threeAnimId) cancelAnimationFrame(threeAnimId);
+  if (threeRenderer) {
+    threeRenderer.dispose();
+    threeRenderer = null;
+  }
+  threeScene = null; threeCamera = null; atomGroup = null;
+}
+
+function buildAtomScene(el) {
+  destroyThree();
+  const canvas = document.getElementById('three-canvas');
+  const container = document.getElementById('modal3d');
+  const W = container.clientWidth || 360;
+  const H = container.clientHeight || 280;
+
+  threeRenderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  threeRenderer.setSize(W, H);
+  threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  threeRenderer.setClearColor(0x000000, 0);
+
+  threeScene = new THREE.Scene();
+  threeCamera = new THREE.PerspectiveCamera(50, W / H, 0.1, 100);
+  threeCamera.position.set(0, 0, 6);
+
+  // Ambient + point lights
+  threeScene.add(new THREE.AmbientLight(0xffffff, 0.6));
+  const pLight = new THREE.PointLight(0x7fc8ff, 2, 20);
+  pLight.position.set(4, 4, 4);
+  threeScene.add(pLight);
+  const pLight2 = new THREE.PointLight(0xff9fcc, 1.5, 20);
+  pLight2.position.set(-4, -3, 2);
+  threeScene.add(pLight2);
+
+  atomGroup = new THREE.Group();
+  threeScene.add(atomGroup);
+
+  // Nucleus — clusters of protons+neutrons
+  const nucleusGroup = new THREE.Group();
+  const numNucleons = Math.min(el.z, 20); // limit for perf
+  const nucleonGeo = new THREE.SphereGeometry(0.12, 8, 8);
+  for (let i = 0; i < numNucleons; i++) {
+    const isProton = i < el.z;
+    const mat = new THREE.MeshPhongMaterial({
+      color: isProton ? 0xff6b9d : 0x4fc3f7,
+      shininess: 120, specular: 0xffffff,
+    });
+    const nucl = new THREE.Mesh(nucleonGeo, mat);
+    const theta = (i / numNucleons) * Math.PI * 2;
+    const phi = Math.acos(2 * (i / numNucleons) - 1);
+    const r = 0.25 + (i % 3) * 0.1;
+    nucl.position.set(
+      r * Math.sin(phi) * Math.cos(theta),
+      r * Math.sin(phi) * Math.sin(theta),
+      r * Math.cos(phi)
+    );
+    nucleusGroup.add(nucl);
+  }
+  atomGroup.add(nucleusGroup);
+
+  // Electron shells — based on period/electron count
+  const shells = getShellConfig(el.z);
+  const shellColors = [0x4fc3f7, 0x7c83f5, 0xff6b9d, 0xffe066, 0x7ee8a2, 0xffaa5c, 0xce93d8];
+  
+  shells.forEach((electrons, shellIdx) => {
+    const radius = 0.9 + shellIdx * 0.75;
+    // Orbit ring
+    const ringGeo = new THREE.TorusGeometry(radius, 0.012, 6, 80);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: shellColors[shellIdx % shellColors.length],
+      opacity: 0.3, transparent: true,
+    });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    // Tilt each orbit differently
+    ring.rotation.x = (shellIdx * 0.7 + 0.4);
+    ring.rotation.y = (shellIdx * 0.5);
+    atomGroup.add(ring);
+
+    // Electron spheres
+    const eMat = new THREE.MeshPhongMaterial({
+      color: shellColors[shellIdx % shellColors.length],
+      emissive: shellColors[shellIdx % shellColors.length],
+      emissiveIntensity: 0.4,
+      shininess: 200,
+    });
+    const eGeo = new THREE.SphereGeometry(0.07, 10, 10);
+
+    for (let e = 0; e < electrons; e++) {
+      const electronPivot = new THREE.Object3D();
+      electronPivot.rotation.x = ring.rotation.x;
+      electronPivot.rotation.y = ring.rotation.y;
+      const electronMesh = new THREE.Mesh(eGeo, eMat);
+      const angle = (e / electrons) * Math.PI * 2;
+      electronMesh.position.set(
+        radius * Math.cos(angle),
+        radius * Math.sin(angle),
+        0
+      );
+      electronPivot.add(electronMesh);
+      electronPivot.userData.speed = 0.4 + shellIdx * 0.2 + e * 0.01;
+      electronPivot.userData.isElectron = true;
+      electronPivot.userData.radius = radius;
+      electronPivot.userData.angle = angle;
+      electronPivot.userData.shellIdx = shellIdx;
+      atomGroup.add(electronPivot);
+    }
+  });
+
+  // Drag to rotate
+  canvas.addEventListener('mousedown', onDragStart);
+  canvas.addEventListener('mousemove', onDragMove);
+  canvas.addEventListener('mouseup', onDragEnd);
+  canvas.addEventListener('touchstart', onTouchStart, { passive: true });
+  canvas.addEventListener('touchmove', onTouchMove, { passive: true });
+  canvas.addEventListener('touchend', onDragEnd);
+
+  // Animation loop
+  let t = 0;
+  function animate() {
+    threeAnimId = requestAnimationFrame(animate);
+    t += 0.012;
+    nucleusGroup.rotation.y = t * 0.3;
+    nucleusGroup.rotation.x = t * 0.2;
+
+    atomGroup.children.forEach(child => {
+      if (child.userData.isElectron) {
+        const si = child.userData.shellIdx;
+        const speed = child.userData.speed;
+        const newAngle = child.userData.angle + t * speed;
+        const r = child.userData.radius;
+        const mesh = child.children[0];
+        mesh.position.set(r * Math.cos(newAngle), r * Math.sin(newAngle), 0);
+      }
+    });
+
+    threeRenderer.render(threeScene, threeCamera);
+  }
+  animate();
+}
+
+// Returns electrons per shell
+function getShellConfig(z) {
+  const maxByShell = [2, 8, 18, 32, 32, 18, 8];
+  const shells = [];
+  let remaining = z;
+  for (let cap of maxByShell) {
+    if (remaining <= 0) break;
+    const n = Math.min(remaining, cap);
+    shells.push(n);
+    remaining -= n;
+  }
+  return shells;
+}
+
+// Drag rotation
+function onDragStart(e) { isDragging = true; prevMouse = { x: e.clientX, y: e.clientY }; }
+function onDragMove(e) {
+  if (!isDragging || !atomGroup) return;
+  const dx = e.clientX - prevMouse.x;
+  const dy = e.clientY - prevMouse.y;
+  atomGroup.rotation.y += dx * 0.012;
+  atomGroup.rotation.x += dy * 0.012;
+  prevMouse = { x: e.clientX, y: e.clientY };
+}
+function onDragEnd() { isDragging = false; }
+function onTouchStart(e) {
+  if (e.touches.length === 1) onDragStart({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY });
+}
+function onTouchMove(e) {
+  if (e.touches.length === 1) onDragMove({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY });
+}

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,7 +8,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=New+York:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="style.css" />
-<!-- Fallback fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -16,39 +15,42 @@
 
 <div class="ambient"></div>
 
-<!-- Header -->
+<div class="toolbar" id="toolbar">
+  <button class="tb-btn" id="themeToggle" data-i18n-title="theme_toggle_title" title="Toggle Theme">
+    <span class="tb-icon" id="themeIcon">☀️</span>
+  </button>
+  <button class="tb-btn" id="langToggle" data-i18n-title="lang_toggle_title" title="Switch Language">
+    <span class="tb-lang" id="langLabel">中</span>
+  </button>
+</div>
+
 <header class="header">
   <div class="header-title">
-    <h1>Periodic Table</h1>
-    <p>118 Elements · Liquid Glass Interface</p>
+    <h1 data-i18n="title">Periodic Table</h1>
+    <p data-i18n="subtitle">118 Elements · Liquid Glass Interface</p>
   </div>
   <span class="element-count">v2025 · IUPAC</span>
 </header>
 
-<!-- Search -->
 <div class="search-wrap">
   <span class="search-icon">⌕</span>
-  <input class="search-input" type="text" placeholder="Search element or symbol…" id="searchInput" />
+  <input class="search-input" type="text" data-i18n-placeholder="search_placeholder" placeholder="Search element or symbol…" id="searchInput" />
 </div>
 
-<!-- Legend -->
 <div class="legend" id="legend"></div>
 
-<!-- Periodic Grid -->
 <div class="table-scroll">
   <div class="periodic-grid" id="periodicGrid"></div>
 </div>
 
-<!-- Tooltip -->
 <div class="tooltip" id="tooltip"></div>
 
-<!-- Modal -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal-card" id="modalCard">
     <div class="modal-3d" id="modal3d">
       <canvas id="three-canvas"></canvas>
-      <div class="modal-3d-label">Atomic Model</div>
-      <div class="drag-hint">↻ Drag to rotate</div>
+      <div class="modal-3d-label" data-i18n="modal_3d_label">Atomic Model</div>
+      <div class="drag-hint" data-i18n="drag_hint">↻ Drag to rotate</div>
     </div>
     <div class="modal-detail" id="modalDetail"></div>
     <button class="modal-close" id="modalClose">✕</button>

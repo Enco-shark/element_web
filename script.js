@@ -105,4 +105,35 @@ const ELEMENTS = [
   { z:101, sym:"Md", name:"Mendelevium", mass:"[258]", cat:"actinide", state:"solid", year:1955, config:"[Rn] 5f¹³ 7s²", group:null, period:10 },
   { z:102, sym:"No", name:"Nobelium", mass:"[259]", cat:"actinide", state:"solid", year:1958, config:"[Rn] 5f¹⁴ 7s²", group:null, period:10 },
   { z:103, sym:"Lr", name:"Lawrencium", mass:"[266]", cat:"actinide", state:"solid", year:1961, config:"[Rn] 5f¹⁴ 7s² 7p¹", group:null, period:10 },
-  { z:104, sym:"Rf", name:"Rutherfordium", mass:"[26
+  { z:104, sym:"Rf", name:"Rutherfordium", mass:"[267]", cat:"transition", state:"solid", year:1969, config:"[Rn] 5f¹⁴ 6d² 7s²", group:4, period:7 },
+  { z:105, sym:"Db", name:"Dubnium", mass:"[268]", cat:"transition", state:"solid", year:1970, config:"[Rn] 5f¹⁴ 6d³ 7s²", group:5, period:7 },
+  { z:106, sym:"Sg", name:"Seaborgium", mass:"[269]", cat:"transition", state:"solid", year:1974, config:"[Rn] 5f¹⁴ 6d⁴ 7s²", group:6, period:7 },
+  { z:107, sym:"Bh", name:"Bohrium", mass:"[270]", cat:"transition", state:"solid", year:1981, config:"[Rn] 5f¹⁴ 6d⁵ 7s²", group:7, period:7 },
+  { z:108, sym:"Hs", name:"Hassium", mass:"[269]", cat:"transition", state:"solid", year:1984, config:"[Rn] 5f¹⁴ 6d⁶ 7s²", group:8, period:7 },
+  { z:109, sym:"Mt", name:"Meitnerium", mass:"[278]", cat:"unknown", state:"unknown", year:1982, config:"[Rn] 5f¹⁴ 6d⁷ 7s²", group:9, period:7 },
+  { z:110, sym:"Ds", name:"Darmstadtium", mass:"[281]", cat:"unknown", state:"unknown", year:1994, config:"[Rn] 5f¹⁴ 6d⁸ 7s²", group:10, period:7 },
+  { z:111, sym:"Rg", name:"Roentgenium", mass:"[282]", cat:"unknown", state:"unknown", year:1994, config:"[Rn] 5f¹⁴ 6d¹⁰ 7s¹", group:11, period:7 },
+  { z:112, sym:"Cn", name:"Copernicium", mass:"[285]", cat:"transition", state:"gas", year:1996, config:"[Rn] 5f¹⁴ 6d¹⁰ 7s²", group:12, period:7 },
+  { z:113, sym:"Nh", name:"Nihonium", mass:"[286]", cat:"unknown", state:"unknown", year:2004, config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p¹", group:13, period:7 },
+  { z:114, sym:"Fl", name:"Flerovium", mass:"[289]", cat:"unknown", state:"unknown", year:1999, config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p²", group:14, period:7 },
+  { z:115, sym:"Mc", name:"Moscovium", mass:"[290]", cat:"unknown", state:"unknown", year:2003, config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p³", group:15, period:7 },
+  { z:116, sym:"Lv", name:"Livermorium", mass:"[293]", cat:"unknown", state:"unknown", year:2000, config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁴", group:16, period:7 },
+  { z:117, sym:"Ts", name:"Tennessine", mass:"[294]", cat:"halogen", state:"unknown", year:2010, config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁵", group:17, period:7 },
+  { z:118, sym:"Og", name:"Oganesson", mass:"[294]", cat:"noble-gas", state:"unknown", year:2002, config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶", group:18, period:7 },
+];
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CATEGORY META
+═══════════════════════════════════════════════════════════════════════ */
+const CAT_META = {
+  "alkali": { label:"Alkali Metals", color:"var(--c-alkali)" },
+  "alkaline": { label:"Alkaline Earth Metals", color:"var(--c-alkaline)" },
+  "lanthanide": { label:"Lanthanides", color:"var(--c-lanthanide)" },
+  "actinide": { label:"Actinides", color:"var(--c-actinide)" },
+  "transition": { label:"Transition Metals", color:"var(--c-transition)" },
+  "post-trans": { label:"Post-transition Metals", color:"var(--c-post-trans)" },
+  "metalloid": { label:"Metalloids", color:"var(--c-metalloid)" },
+  "nonmetal": { label:"Nonmetals", color:"var(--c-nonmetal)" },
+  "halogen": { label:"Halogens", color:"var(--c-halogen)" },
+  "noble-gas": { label:"Noble Gases", color:"var(--c-noble)" },
+  "unknown": { label:"Unknown Properties", color:"var(--c-unknown)" },

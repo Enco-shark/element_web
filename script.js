@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   ELEMENT DATA — 118 elements
+   ELEMENT DATA — 118 Elements
 ═══════════════════════════════════════════════════════════════════════ */
 const ELEMENTS = [
   { z:1, sym:"H", name:"Hydrogen", name_zh:"氢", mass:"1.008", cat:"nonmetal", state:"gas", year:1766, config:"1s¹", group:1, period:1 },
@@ -123,7 +123,7 @@ const ELEMENTS = [
 ];
 
 /* ═══════════════════════════════════════════════════════════════════════
-   I18N DICTIONARY
+   I18N Dictionary
 ═══════════════════════════════════════════════════════════════════════ */
 const I18N = {
   en: {
@@ -203,7 +203,7 @@ const I18N = {
 };
 
 /* ═══════════════════════════════════════════════════════════════════════
-   STATE — Theme & Language
+   State — Theme & Language
 ═══════════════════════════════════════════════════════════════════════ */
 let currentLang = localStorage.getItem('element-lang') || 'en';
 let currentTheme = localStorage.getItem('element-theme') || 'dark';
@@ -234,7 +234,7 @@ function getCatLabel(cat) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   THEME TOGGLE
+   Theme Toggle
 ═══════════════════════════════════════════════════════════════════════ */
 function applyTheme() {
   document.documentElement.setAttribute('data-theme', currentTheme);
@@ -242,6 +242,7 @@ function applyTheme() {
   if (themeIcon) {
     themeIcon.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
   }
+  refreshParticleColors();
 }
 
 document.getElementById('themeToggle').addEventListener('click', () => {
@@ -251,7 +252,7 @@ document.getElementById('themeToggle').addEventListener('click', () => {
 });
 
 /* ═══════════════════════════════════════════════════════════════════════
-   LANGUAGE TOGGLE & UI UPDATE
+   Language Toggle & UI Update
 ═══════════════════════════════════════════════════════════════════════ */
 function applyLanguage() {
   document.documentElement.lang = currentLang;
@@ -312,7 +313,7 @@ document.getElementById('langToggle').addEventListener('click', () => {
 });
 
 /* ═══════════════════════════════════════════════════════════════════════
-   CATEGORY META
+   Category Meta
 ═══════════════════════════════════════════════════════════════════════ */
 const CAT_META = {
   "alkali": { color:"var(--c-alkali)" },
@@ -329,7 +330,7 @@ const CAT_META = {
 };
 
 /* ═══════════════════════════════════════════════════════════════════════
-   BUILD LEGEND
+   Build Legend
 ═══════════════════════════════════════════════════════════════════════ */
 let activeFilter = null;
 const legendEl = document.getElementById('legend');
@@ -365,7 +366,180 @@ function toggleFilter(cat, itemEl) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   BUILD PERIODIC GRID
+   🫧 LIQUID GLASS ENGINE — shuding/liquid-glass SDF refraction
+   Canvas displacement map → SVG feDisplacementMap → backdrop-filter
+═══════════════════════════════════════════════════════════════════════ */
+const LiquidGlassEngine = (() => {
+  const MAP_SIZE = 256;
+  let canvas, ctx;
+  let activeTile = null;
+  let mouseUX = 0.5, mouseUY = 0.5;
+  let rafId = null;
+  let needsUpdate = false;
+
+  function smoothStep(a, b, t) {
+    t = Math.max(0, Math.min(1, (t - a) / (b - a)));
+    return t * t * (3 - 2 * t);
+  }
+
+  function len(x, y) {
+    return Math.sqrt(x * x + y * y);
+  }
+
+  // Rounded rectangle SDF — output is negative inside, positive outside
+  function roundedRectSDF(x, y, hw, hh, r) {
+    const qx = Math.abs(x) - hw + r;
+    const qy = Math.abs(y) - hh + r;
+    return Math.min(Math.max(qx, qy), 0) + len(Math.max(qx, 0), Math.max(qy, 0)) - r;
+  }
+
+  function generateDisplacementMap() {
+    const w = MAP_SIZE;
+    const h = MAP_SIZE;
+    const data = ctx.createImageData(w, h);
+    const rawValues = [];
+    let maxScale = 0;
+
+    // Mouse offset normalized to [-0.4, 0.4]
+    const mx = (mouseUX - 0.5) * 0.5;
+    const my = (mouseUY - 0.5) * 0.5;
+
+    for (let i = 0; i < w * h; i++) {
+      const x = i % w;
+      const y = Math.floor(i / w);
+      const ux = x / w - 0.5;
+      const uy = y / h - 0.5;
+
+      // SDF for rounded rectangle filling the tile
+      const dist = roundedRectSDF(ux, uy, 0.42, 0.42, 0.48);
+
+      // Strong displacement near edges, fading to zero at center
+      // Negative dist = inside shape, displacement = 1; positive dist = outside, displacement = 0
+      const displacement = smoothStep(0.82, -0.05, dist);
+
+      // Mouse influence: stronger near center, fades near edges
+      const mouseInfluence = smoothStep(0, 0.75, displacement);
+
+      // Combine: edge-lens warp + mouse-directed bias
+      const dx = ux * displacement + mx * mouseInfluence * 0.3;
+      const dy = uy * displacement + my * mouseInfluence * 0.3;
+
+      rawValues.push(dx, dy);
+      maxScale = Math.max(maxScale, Math.abs(dx), Math.abs(dy));
+    }
+
+    maxScale = Math.max(maxScale, 0.001);
+
+    let idx = 0;
+    for (let i = 0; i < w * h * 4; i += 4) {
+      const r = rawValues[idx] / maxScale * 0.5 + 0.5;
+      const g = rawValues[idx + 1] / maxScale * 0.5 + 0.5;
+      data.data[i] = Math.round(r * 255);
+      data.data[i + 1] = Math.round(g * 255);
+      data.data[i + 2] = 0;
+      data.data[i + 3] = 255;
+      idx += 2;
+    }
+
+    ctx.putImageData(data, 0, 0);
+
+    const mapEl = document.getElementById('lg-displacement-map');
+    if (mapEl) {
+      const dataUrl = canvas.toDataURL();
+      mapEl.setAttributeNS('http://www.w3.org/1999/xlink', 'href', dataUrl);
+      mapEl.setAttribute('href', dataUrl);
+    }
+  }
+
+  function renderLoop() {
+    if (needsUpdate && activeTile) {
+      generateDisplacementMap();
+      needsUpdate = false;
+    }
+    rafId = requestAnimationFrame(renderLoop);
+  }
+
+  function init() {
+    canvas = document.createElement('canvas');
+    canvas.width = MAP_SIZE;
+    canvas.height = MAP_SIZE;
+    canvas.style.display = 'none';
+    canvas.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(canvas);
+    ctx = canvas.getContext('2d');
+
+    generateDisplacementMap();
+    rafId = requestAnimationFrame(renderLoop);
+  }
+
+  function attach(tile) {
+    tile.addEventListener('mouseenter', (e) => {
+      if (activeTile && activeTile !== tile) {
+        activeTile.classList.remove('liquid-glass-active');
+        activeTile.style.transform = '';
+        activeTile.style.removeProperty('--mouse-x');
+        activeTile.style.removeProperty('--mouse-y');
+      }
+      activeTile = tile;
+      const rect = tile.getBoundingClientRect();
+      const xPct = ((e.clientX - rect.left) / rect.width) * 100;
+      const yPct = ((e.clientY - rect.top) / rect.height) * 100;
+      mouseUX = xPct / 100;
+      mouseUY = yPct / 100;
+      tile.style.setProperty('--mouse-x', `${xPct}%`);
+      tile.style.setProperty('--mouse-y', `${yPct}%`);
+      tile.classList.add('liquid-glass-active');
+      needsUpdate = true;
+    });
+
+    tile.addEventListener('mousemove', (e) => {
+      if (activeTile !== tile) return;
+      const rect = tile.getBoundingClientRect();
+      const xPct = ((e.clientX - rect.left) / rect.width) * 100;
+      const yPct = ((e.clientY - rect.top) / rect.height) * 100;
+      mouseUX = xPct / 100;
+      mouseUY = yPct / 100;
+      needsUpdate = true;
+
+      tile.style.setProperty('--mouse-x', `${xPct}%`);
+      tile.style.setProperty('--mouse-y', `${yPct}%`);
+
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const tiltX = e.clientX - rect.left - centerX;
+      const tiltY = e.clientY - rect.top - centerY;
+      tile.style.transform = `scale(1.14) translateY(-6px) perspective(600px) rotateX(${-tiltY * 0.06}deg) rotateY(${tiltX * 0.06}deg)`;
+    });
+
+    tile.addEventListener('mouseleave', () => {
+      if (activeTile === tile) {
+        tile.classList.remove('liquid-glass-active');
+        tile.style.transform = '';
+        tile.style.removeProperty('--mouse-x');
+        tile.style.removeProperty('--mouse-y');
+        activeTile = null;
+      }
+    });
+  }
+
+  /* ── Modal attachment — same SDF refraction on the modal card ── */
+  let modalCardEl = null;
+
+  function attachModal(card) {
+    if (modalCardEl) detachModal();
+    modalCardEl = card;
+    needsUpdate = true;
+  }
+
+  function detachModal() {
+    modalCardEl = null;
+  }
+
+  return { init, attach, attachModal, detachModal };
+})();
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Build Periodic Grid
 ═══════════════════════════════════════════════════════════════════════ */
 const grid = document.getElementById('periodicGrid');
 
@@ -402,12 +576,15 @@ ELEMENTS.forEach((el, idx) => {
     "noble-gas": "var(--c-noble)",
     "unknown": "var(--c-unknown)",
   };
-  tile.style.setProperty('--cat-color', colorMap[el.cat] || 'rgba(255,255,255,0.2)');
+  tile.style.setProperty('--cat-color', colorMap[el.cat] || 'rgba(255,255,247,0.2)');
 
   tile.style.animationDelay = `${0.008 * idx}s`;
 
   const displayName = getElName(el);
   tile.innerHTML = `
+    <div class="liquid-glass-inner"></div>
+    <div class="el-cat-dot"></div>
+    <div class="category-glow"></div>
     <span class="el-number">${el.z}</span>
     <span class="el-symbol">${el.sym}</span>
     <span class="el-name">${displayName}</span>
@@ -418,11 +595,25 @@ ELEMENTS.forEach((el, idx) => {
   tile.style.gridColumn = pos.col;
   tile.style.gridRow = pos.row;
 
-  tile.addEventListener('mouseenter', e => showTooltip(e, el));
-  tile.addEventListener('mouseleave', hideTooltip);
-  tile.addEventListener('mousemove', moveTooltip);
+  // Liquid Glass Engine — per-tile SDF distortion
+  LiquidGlassEngine.attach(tile);
 
-  tile.addEventListener('click', () => openModal(el));
+  tile.addEventListener('mouseenter', e => {
+    showTooltip(e, el);
+  });
+
+  tile.addEventListener('mouseleave', () => {
+    hideTooltip();
+  });
+
+  tile.addEventListener('click', () => {
+    tile.style.transition = 'transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    tile.style.transform = 'scale(0.98)';
+    setTimeout(() => {
+      tile.style.transition = '';
+    }, 150);
+    openModal(el);
+  });
 
   grid.appendChild(tile);
 });
@@ -447,7 +638,7 @@ makeRowLabel('Ln', 3, 9);
 makeRowLabel('An', 3, 10);
 
 /* ═══════════════════════════════════════════════════════════════════════
-   TOOLTIP
+   Tooltip
 ═══════════════════════════════════════════════════════════════════════ */
 const tooltip = document.getElementById('tooltip');
 let tooltipVisible = false;
@@ -472,7 +663,7 @@ function moveTooltip(e) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   SEARCH
+   Search
 ═══════════════════════════════════════════════════════════════════════ */
 document.getElementById('searchInput').addEventListener('input', function() {
   const q = this.value.toLowerCase().trim();
@@ -497,7 +688,7 @@ document.getElementById('searchInput').addEventListener('input', function() {
 });
 
 /* ═══════════════════════════════════════════════════════════════════════
-   MODAL
+   Modal
 ═══════════════════════════════════════════════════════════════════════ */
 const overlay = document.getElementById('modalOverlay');
 const detailPanel = document.getElementById('modalDetail');
@@ -513,7 +704,7 @@ function renderModalDetail(el) {
     "metalloid":"var(--c-metalloid)","nonmetal":"var(--c-nonmetal)",
     "halogen":"var(--c-halogen)","noble-gas":"var(--c-noble)","unknown":"var(--c-unknown)"
   };
-  const catColor = colorMap[el.cat] || 'rgba(255,255,255,0.5)';
+  const catColor = colorMap[el.cat] || 'rgba(255,255,247,0.5)';
   const catLabel = getCatLabel(el.cat);
   const displayName = getElName(el);
   const stateClass = { solid:'state-solid', liquid:'state-liquid', gas:'state-gas', unknown:'state-unknown' }[el.state] || 'state-unknown';
@@ -576,7 +767,7 @@ overlay.addEventListener('click', e => { if (e.target === overlay) closeModal();
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
 /* ═══════════════════════════════════════════════════════════════════════
-   THREE.JS ATOMIC VISUALISATION
+   THREE.JS Atomic Visualisation
 ═══════════════════════════════════════════════════════════════════════ */
 function destroyThree() {
   if (threeAnimId) cancelAnimationFrame(threeAnimId);
@@ -750,7 +941,335 @@ function onTouchMove(e) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   INITIALISATION
+   ⭐ ULTRA PREMIUM PARTICLE SYSTEM ⭐
+═══════════════════════════════════════════════════════════════════════ */
+
+// Configuration
+const PARTICLE_ICONS = [
+  'H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne',
+  'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar', 'K', 'Ca',
+  'Sc', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn',
+  'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr', 'Rb', 'Sr', 'Y', 'Zr',
+  'Nb', 'Mo', 'Tc', 'Ru', 'Rh', 'Pd', 'Ag', 'Cd', 'In', 'Sn',
+  'Sb', 'Te', 'I', 'Xe', 'Cs', 'Ba', 'La', 'Ce', 'Pr', 'Nd',
+  'Pm', 'Sm', 'Eu', 'Gd', 'Tb', 'Dy', 'Ho', 'Er', 'Tm', 'Yb',
+  'Lu', 'Hf', 'Ta', 'W', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg',
+  'Tl', 'Pb', 'Bi', 'Po', 'At', 'Rn', 'Fr', 'Ra', 'Ac', 'Th',
+  'Pa', 'U', 'Np', 'Pu', 'Am', 'Cm', 'Bk', 'Cf', 'Es', 'Fm',
+  'Md', 'No', 'Lr', 'Rf', 'Db', 'Sg', 'Bh', 'Hs', 'Mt', 'Ds',
+  'Rg', 'Cn', 'Nh', 'Fl', 'Mc', 'Lv', 'Ts', 'Og'
+];
+
+const COLORS_LIGHT = [
+  'rgba(26,115,232,0.9)',
+  'rgba(52,168,83,0.9)',
+  'rgba(244,128,36,0.88)',
+  'rgba(219,68,55,0.88)',
+  'rgba(66,133,244,0.88)',
+  'rgba(142,68,173,0.88)',
+  'rgba(26,173,207,0.88)',
+  'rgba(255,193,7,0.88)',
+];
+
+const COLORS_DARK = [
+  'rgba(102,157,246,0.9)',
+  'rgba(128,203,196,0.9)',
+  'rgba(255,179,102,0.9)',
+  'rgba(240,143,143,0.9)',
+  'rgba(158,158,255,0.9)',
+  'rgba(206,147,216,0.9)',
+  'rgba(103,209,237,0.9)',
+  'rgba(255,236,179,0.9)',
+];
+
+const PARTICLE_COUNT = 75;
+const MOUSE_INFLUENCE_RADIUS = 260;
+const GRAVITY_STRENGTH = 0.8;
+const FRICTION = 0.96;
+const EDGE_BOUNCE = 0.65;
+
+// State
+const container = document.getElementById('particleContainer');
+const particles = [];
+let mouseX = -9999;
+let mouseY = -9999;
+let isMouseOnScreen = false;
+let mouseVelX = 0;
+let mouseVelY = 0;
+let lastMouseX = 0;
+let lastMouseY = 0;
+let time = 0;
+
+// Utils
+function getColors() {
+  return currentTheme === 'light' ? COLORS_LIGHT : COLORS_DARK;
+}
+
+function randomColor() {
+  const colors = getColors();
+  return colors[Math.floor(Math.random() * colors.length)];
+}
+
+function lerp(a, b, t) {
+  return a + (b - a) * t;
+}
+
+function map(value, min1, max1, min2, max2) {
+  return ((value - min1) / (max1 - min1)) * (max2 - min2) + min2;
+}
+
+// Create particle
+function spawnParticle(initial = false) {
+  const el = document.createElement('span');
+  el.className = 'particle-icon';
+  el.textContent = PARTICLE_ICONS[Math.floor(Math.random() * PARTICLE_ICONS.length)];
+  el.style.color = randomColor();
+  el.style.opacity = '0';
+  
+  const size = Math.random() * 16 + 20;
+  el.style.fontSize = `${size}px`;
+  
+  const x = Math.random() * window.innerWidth;
+  const y = initial ? Math.random() * window.innerHeight : window.innerHeight + 60 + Math.random() * 100;
+  
+  el.style.left = `${x}px`;
+  el.style.top = `${y}px`;
+  container.appendChild(el);
+  
+  return {
+    el,
+    x,
+    y,
+    targetX: x,
+    targetY: y,
+    vx: (Math.random() - 0.5) * 0.8,
+    vy: -(Math.random() * 0.6 + 0.18),
+    rot: Math.random() * Math.PI * 2,
+    rotSpeed: (Math.random() - 0.5) * 0.028,
+    wobblePhase: Math.random() * Math.PI * 2,
+    wobbleSpeed: Math.random() * 0.018 + 0.008,
+    wobbleAmp: Math.random() * 40 + 15,
+    breathPhase: Math.random() * Math.PI * 2,
+    breathSpeed: Math.random() * 0.022 + 0.008,
+    baseOpacity: Math.random() * 0.25 + 0.4,
+    scale: 1,
+    targetScale: 1,
+    nearMouse: false,
+    mouseEnterTime: 0,
+    originalColor: el.style.color,
+    targetOpacity: 0,
+    targetColor: null,
+    glowPhase: Math.random() * Math.PI * 2,
+    layer: Math.random() > 0.5 ? 0 : 1,
+    index: particles.length,
+  };
+}
+
+// Initialize particles
+for (let i = 0; i < PARTICLE_COUNT; i++) {
+  particles.push(spawnParticle(true));
+}
+
+// Mouse tracking
+document.addEventListener('mousemove', (e) => {
+  const newX = e.clientX;
+  const newY = e.clientY;
+  
+  mouseVelX = (newX - lastMouseX) * 0.18;
+  mouseVelY = (newY - lastMouseY) * 0.18;
+  
+  mouseX = newX;
+  mouseY = newY;
+  lastMouseX = mouseX;
+  lastMouseY = mouseY;
+  isMouseOnScreen = true;
+});
+
+document.addEventListener('mouseenter', () => {
+  isMouseOnScreen = true;
+});
+
+document.addEventListener('mouseleave', () => {
+  isMouseOnScreen = false;
+  mouseVelX *= 0.8;
+  mouseVelY *= 0.8;
+});
+
+document.addEventListener('touchmove', (e) => {
+  if (e.touches.length) {
+    const touch = e.touches[0];
+    const newX = touch.clientX;
+    const newY = touch.clientY;
+    mouseVelX = (newX - lastMouseX) * 0.14;
+    mouseVelY = (newY - lastMouseY) * 0.14;
+    mouseX = newX;
+    mouseY = newY;
+    lastMouseX = mouseX;
+    lastMouseY = mouseY;
+    isMouseOnScreen = true;
+  }
+}, { passive: true });
+
+document.addEventListener('touchend', () => {
+  isMouseOnScreen = false;
+});
+
+// Theme switch handler
+function refreshParticleColors() {
+  particles.forEach(p => {
+    p.el.style.color = randomColor();
+    p.originalColor = p.el.style.color;
+  });
+}
+
+// Main animation loop
+function animate() {
+  time += 0.016;
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+  
+  // Update all particles
+  for (let i = 0; i < particles.length; i++) {
+    const p = particles[i];
+    
+    // Update phases
+    p.wobblePhase += p.wobbleSpeed;
+    p.breathPhase += p.breathSpeed;
+    p.glowPhase += 0.012;
+    p.rot += p.rotSpeed;
+    
+    // Calculate distance to mouse
+    const dx = mouseX - p.x;
+    const dy = mouseY - p.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    
+    // Layer offset for depth
+    const layerOffset = p.layer * 0.4;
+    
+    // Base opacity
+    let targetOpacity = p.baseOpacity + Math.sin(p.breathPhase) * 0.08;
+    
+    // Target scale
+    p.targetScale = 0.78 + Math.sin(p.breathPhase) * 0.28 + layerOffset * 0.15;
+    
+    // Mouse interaction logic
+    if (isMouseOnScreen && dist < MOUSE_INFLUENCE_RADIUS) {
+      // Entering mouse area
+      if (!p.nearMouse) {
+        p.nearMouse = true;
+        p.mouseEnterTime = Date.now();
+        p.originalColor = p.el.style.color;
+        p.targetColor = randomColor();
+      }
+      
+      // Calculate influence
+      const influence = Math.pow(1 - Math.max(0, dist / MOUSE_INFLUENCE_RADIUS), 2.2);
+      const angle = Math.atan2(dy, dx);
+      
+      // STRONG attractive force - particles gently pull towards cursor
+      const force = influence * GRAVITY_STRENGTH * (1 + layerOffset * 0.5);
+      p.vx += Math.cos(angle) * force * 0.012;
+      p.vy += Math.sin(angle) * force * 0.012;
+      
+      // Mouse velocity influence - particles trail your movement
+      p.vx += mouseVelX * 0.06 * influence;
+      p.vy += mouseVelY * 0.06 * influence;
+      
+      // Boost opacity and scale on hover
+      const ramp = Math.min((Date.now() - p.mouseEnterTime) / 260, 1);
+      targetOpacity = Math.min(1, p.baseOpacity + 0.45 * influence * ramp);
+      p.targetScale = 0.85 + Math.sin(p.breathPhase) * 0.35 + 0.3 * influence * ramp;
+      
+    } else {
+      // Leaving mouse area
+      if (p.nearMouse) {
+        p.nearMouse = false;
+        p.targetColor = null;
+      }
+    }
+    
+    // Apply drag/friction
+    p.vx *= FRICTION - layerOffset * 0.02;
+    p.vy *= FRICTION - layerOffset * 0.02;
+    
+    // Apply wobble for organic movement
+    const wobbleX = Math.sin(p.wobblePhase) * p.wobbleAmp * 0.014;
+    const wobbleY = Math.cos(p.wobblePhase * 0.73) * p.wobbleAmp * 0.006;
+    p.vx += wobbleX * (0.45 - layerOffset * 0.1);
+    p.vy += wobbleY * (0.25 - layerOffset * 0.05);
+    
+    // Slight upward drift
+    p.vy -= (0.04 + layerOffset * 0.02);
+    
+    // Move particle
+    p.x += p.vx;
+    p.y += p.vy;
+    
+    // Bounce off horizontal edges
+    if (p.x < -60) {
+      p.x = -60;
+      p.vx *= -EDGE_BOUNCE;
+    }
+    if (p.x > W + 60) {
+      p.x = W + 60;
+      p.vx *= -EDGE_BOUNCE;
+    }
+    
+    // Respawn when going off top
+    if (p.y < -80) {
+      p.x = Math.random() * W;
+      p.y = H + 50 + Math.random() * 80;
+      p.vx = (Math.random() - 0.5) * 0.8;
+      p.vy = -(Math.random() * 0.6 + 0.18);
+      p.baseOpacity = Math.random() * 0.25 + 0.4;
+      p.el.textContent = PARTICLE_ICONS[Math.floor(Math.random() * PARTICLE_ICONS.length)];
+      p.el.style.color = randomColor();
+      p.originalColor = p.el.style.color;
+      p.targetColor = null;
+      p.nearMouse = false;
+      p.layer = Math.random() > 0.5 ? 0 : 1;
+    }
+    
+    // Smooth interpolations
+    p.scale = lerp(p.scale, p.targetScale, 0.06);
+    const currentOpacity = parseFloat(p.el.style.opacity) || p.baseOpacity;
+    p.el.style.opacity = String(lerp(currentOpacity, targetOpacity, 0.08));
+    
+    // Glow effect based on distance to mouse
+    let glowIntensity = 0;
+    if (isMouseOnScreen && dist < MOUSE_INFLUENCE_RADIUS * 0.85) {
+      glowIntensity = Math.pow(1 - Math.max(0, dist / (MOUSE_INFLUENCE_RADIUS * 0.85)), 2.5) * 0.5;
+    }
+    glowIntensity += Math.sin(p.glowPhase) * 0.03 + 0.02;
+    
+    // Update DOM transform
+    const scaleX = p.scale;
+    const scaleY = p.scale;
+    const transX = p.x;
+    const transY = p.y;
+    const rotation = p.rot;
+    
+    // Apply glow as filter shadow
+    let filterStr = '';
+    if (glowIntensity > 0.01) {
+      const blurRadius = 6 + glowIntensity * 18;
+      filterStr = `drop-shadow(0 0 ${blurRadius}px ${p.el.style.color})`;
+    }
+    p.el.style.filter = filterStr || 'none';
+    
+    // Combined transform
+    p.el.style.transform = `translate3d(${transX}px, ${transY}px, ${p.layer * 30}px) rotate(${rotation}rad) scale(${scaleX}, ${scaleY})`;
+  }
+  
+  requestAnimationFrame(animate);
+}
+
+// Start animation
+animate();
+
+/* ═══════════════════════════════════════════════════════════════════════
+   INITIALIZATION
 ═══════════════════════════════════════════════════════════════════════ */
 applyTheme();
 applyLanguage();
+LiquidGlassEngine.init();

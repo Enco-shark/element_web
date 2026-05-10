@@ -452,7 +452,7 @@ const LiquidGlassEngine = (() => {
   }
 
   function renderLoop() {
-    if (needsUpdate && activeTile) {
+    if (needsUpdate && (activeTile || modalCardEl)) {
       generateDisplacementMap();
       needsUpdate = false;
     }
@@ -524,14 +524,27 @@ const LiquidGlassEngine = (() => {
 
   /* ── Modal attachment — same SDF refraction on the modal card ── */
   let modalCardEl = null;
+  let modalMouseHandler = null;
 
   function attachModal(card) {
     if (modalCardEl) detachModal();
     modalCardEl = card;
+    modalMouseHandler = (e) => {
+      if (!modalCardEl) return;
+      const rect = modalCardEl.getBoundingClientRect();
+      mouseUX = (e.clientX - rect.left) / rect.width;
+      mouseUY = (e.clientY - rect.top) / rect.height;
+      needsUpdate = true;
+    };
+    document.addEventListener('mousemove', modalMouseHandler);
     needsUpdate = true;
   }
 
   function detachModal() {
+    if (modalMouseHandler) {
+      document.removeEventListener('mousemove', modalMouseHandler);
+      modalMouseHandler = null;
+    }
     modalCardEl = null;
   }
 
@@ -752,6 +765,8 @@ function openModal(el) {
   renderModalDetail(el);
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
+  const card = document.getElementById('modalCard');
+  LiquidGlassEngine.attachModal(card);
   requestAnimationFrame(() => buildAtomScene(el));
 }
 
@@ -759,6 +774,7 @@ function closeModal() {
   overlay.classList.remove('open');
   document.body.style.overflow = '';
   detailPanel.dataset.z = '';
+  LiquidGlassEngine.detachModal();
   destroyThree();
 }
 

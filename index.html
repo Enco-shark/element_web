@@ -1,62 +1,78 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="zh-CN">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Elements — Periodic Table</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=New+York:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="style.css" />
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Antigravity Particles</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <canvas id="scene"></canvas>
 
-<div class="ambient"></div>
+  <div class="noise-overlay"></div>
+  <div class="vignette"></div>
 
-<div class="toolbar" id="toolbar">
-  <button class="tb-btn" id="themeToggle" data-i18n-title="theme_toggle_title" title="Toggle Theme">
-    <span class="tb-icon" id="themeIcon">☀️</span>
-  </button>
-  <button class="tb-btn" id="langToggle" data-i18n-title="lang_toggle_title" title="Switch Language">
-    <span class="tb-lang" id="langLabel">中</span>
-  </button>
-</div>
-
-<header class="header">
-  <div class="header-title">
-    <h1 data-i18n="title">Periodic Table</h1>
-    <p data-i18n="subtitle">118 Elements · Liquid Glass Interface</p>
-  </div>
-  <span class="element-count">v2025 · IUPAC</span>
-</header>
-
-<div class="search-wrap">
-  <span class="search-icon">⌕</span>
-  <input class="search-input" type="text" data-i18n-placeholder="search_placeholder" placeholder="Search element or symbol…" id="searchInput" />
-</div>
-
-<div class="legend" id="legend"></div>
-
-<div class="table-scroll">
-  <div class="periodic-grid" id="periodicGrid"></div>
-</div>
-
-<div class="tooltip" id="tooltip"></div>
-
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal-card" id="modalCard">
-    <div class="modal-3d" id="modal3d">
-      <canvas id="three-canvas"></canvas>
-      <div class="modal-3d-label" data-i18n="modal_3d_label">Atomic Model</div>
-      <div class="drag-hint" data-i18n="drag_hint">↻ Drag to rotate</div>
+  <header class="hero">
+    <div class="hero-copy">
+      <span class="eyebrow">Particle Flow System</span>
+      <h1>高级反重力粒子场</h1>
+      <p>
+        参考 `antigravity.google` 的空间感与流动质感，做成更高级的版本：
+        多层流场、引力核、鼠标扰动、速度辉光、景深与雾化拖尾同时存在。
+      </p>
     </div>
-    <div class="modal-detail" id="modalDetail"></div>
-    <button class="modal-close" id="modalClose">✕</button>
-  </div>
-</div>
 
-<script src="script.js"></script>
+    <div class="stats">
+      <div class="stat-card">
+        <span class="stat-label">粒子数</span>
+        <strong id="particleCountLabel">0</strong>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">模式</span>
+        <strong id="modeLabel">Void Drift</strong>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">交互</span>
+        <strong>Move / Touch</strong>
+      </div>
+    </div>
+  </header>
+
+  <aside class="control-panel">
+    <div class="panel-header">
+      <h2>Scene Controls</h2>
+      <button id="randomizeBtn" class="ghost-button" type="button">随机场景</button>
+    </div>
+
+    <label class="control">
+      <span>粒子密度</span>
+      <input id="particleDensity" type="range" min="0.4" max="1.6" step="0.05" value="1.0" />
+    </label>
+
+    <label class="control">
+      <span>湍流强度</span>
+      <input id="turbulence" type="range" min="0.2" max="2.4" step="0.05" value="1.2" />
+    </label>
+
+    <label class="control">
+      <span>轨迹长度</span>
+      <input id="trailFade" type="range" min="0.02" max="0.18" step="0.005" value="0.07" />
+    </label>
+
+    <label class="control">
+      <span>引力强度</span>
+      <input id="gravityStrength" type="range" min="0.1" max="2.4" step="0.05" value="1.15" />
+    </label>
+
+    <div class="panel-footer">
+      <button id="toggleMotionBtn" class="primary-button" type="button">暂停运动</button>
+      <button id="boostBtn" class="ghost-button" type="button">脉冲增强</button>
+    </div>
+  </aside>
+
+  <script src="script.js"></script>
 </body>
 </html>

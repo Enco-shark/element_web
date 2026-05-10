@@ -999,10 +999,81 @@ const COLORS_DARK = [
 ];
 
 const PARTICLE_COUNT = 75;
-const MOUSE_INFLUENCE_RADIUS = 260;
-const GRAVITY_STRENGTH = 0.8;
-const FRICTION = 0.96;
+const MOUSE_INFLUENCE_RADIUS = 360;
+const GRAVITY_STRENGTH = 1.6;
+const FRICTION = 0.94;
 const EDGE_BOUNCE = 0.65;
+const WAVE_STRENGTH = 0.25;
+
+/* ── Poisson Disk Sampling (Bridson's algorithm) ── */
+function poissonDiskSampling(width, height, radius, maxAttempts) {
+  const cellSize = radius / Math.SQRT2;
+  const gridW = Math.ceil(width / cellSize);
+  const gridH = Math.ceil(height / cellSize);
+  const grid = new Array(gridW * gridH).fill(-1);
+  const points = [];
+  const active = [];
+
+  function gridIdx(x, y) {
+    const gx = Math.floor(x / cellSize);
+    const gy = Math.floor(y / cellSize);
+    return gx >= 0 && gx < gridW && gy >= 0 && gy < gridH ? gx + gy * gridW : -1;
+  }
+
+  function isValid(p, existingRadius) {
+    const gx = Math.floor(p[0] / cellSize);
+    const gy = Math.floor(p[1] / cellSize);
+    const startX = Math.max(0, gx - 2);
+    const endX = Math.min(gridW - 1, gx + 2);
+    const startY = Math.max(0, gy - 2);
+    const endY = Math.min(gridH - 1, gy + 2);
+    for (let y = startY; y <= endY; y++) {
+      for (let x = startX; x <= endX; x++) {
+        const idx = x + y * gridW;
+        const pi = grid[idx];
+        if (pi === -1) continue;
+        const dx = p[0] - points[pi][0];
+        const dy = p[1] - points[pi][1];
+        if (dx * dx + dy * dy < existingRadius * existingRadius) return false;
+      }
+    }
+    return true;
+  }
+
+  // Start with a random point
+  const first = [Math.random() * width, Math.random() * height];
+  points.push(first);
+  active.push(0);
+  const gi = gridIdx(first[0], first[1]);
+  if (gi >= 0) grid[gi] = 0;
+
+  while (active.length > 0) {
+    const ai = Math.floor(Math.random() * active.length);
+    const pi = active[ai];
+    let found = false;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = radius + Math.random() * radius;
+      const nx = points[pi][0] + Math.cos(angle) * dist;
+      const ny = points[pi][1] + Math.sin(angle) * dist;
+      if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
+      if (!isValid([nx, ny], radius)) continue;
+      points.push([nx, ny]);
+      active.push(points.length - 1);
+      const ngi = gridIdx(nx, ny);
+      if (ngi >= 0) grid[ngi] = points.length - 1;
+      found = true;
+      break;
+    }
+
+    if (!found) {
+      active.splice(ai, 1);
+    }
+  }
+
+  return points;
+}
 
 // State
 const container = document.getElementById('particleContainer');
@@ -1034,8 +1105,11 @@ function map(value, min1, max1, min2, max2) {
   return ((value - min1) / (max1 - min1)) * (max2 - min2) + min2;
 }
 
+// Poisson-sampled positions (generated once on init)
+let poissonPoints = [];
+
 // Create particle
-function spawnParticle(initial = false) {
+function spawnParticle(posX, posY) {
   const el = document.createElement('span');
   el.className = 'particle-icon';
   el.textContent = PARTICLE_ICONS[Math.floor(Math.random() * PARTICLE_ICONS.length)];
@@ -1045,8 +1119,8 @@ function spawnParticle(initial = false) {
   const size = Math.random() * 16 + 20;
   el.style.fontSize = `${size}px`;
   
-  const x = Math.random() * window.innerWidth;
-  const y = initial ? Math.random() * window.innerHeight : window.innerHeight + 60 + Math.random() * 100;
+  const x = posX;
+  const y = posY;
   
   el.style.left = `${x}px`;
   el.style.top = `${y}px`;
@@ -1056,35 +1130,59 @@ function spawnParticle(initial = false) {
     el,
     x,
     y,
-    targetX: x,
-    targetY: y,
-    vx: (Math.random() - 0.5) * 0.8,
-    vy: -(Math.random() * 0.6 + 0.18),
+    vx: (Math.random() - 0.5) * 0.6,
+    vy: -(Math.random() * 0.5 + 0.15),
     rot: Math.random() * Math.PI * 2,
-    rotSpeed: (Math.random() - 0.5) * 0.028,
+    rotSpeed: (Math.random() - 0.5) * 0.025,
     wobblePhase: Math.random() * Math.PI * 2,
-    wobbleSpeed: Math.random() * 0.018 + 0.008,
-    wobbleAmp: Math.random() * 40 + 15,
+    wobbleSpeed: Math.random() * 0.015 + 0.006,
+    wobbleAmp: Math.random() * 35 + 12,
     breathPhase: Math.random() * Math.PI * 2,
-    breathSpeed: Math.random() * 0.022 + 0.008,
-    baseOpacity: Math.random() * 0.25 + 0.4,
+    breathSpeed: Math.random() * 0.02 + 0.006,
+    baseOpacity: Math.random() * 0.2 + 0.35,
     scale: 1,
     targetScale: 1,
     nearMouse: false,
     mouseEnterTime: 0,
     originalColor: el.style.color,
-    targetOpacity: 0,
     targetColor: null,
     glowPhase: Math.random() * Math.PI * 2,
-    layer: Math.random() > 0.5 ? 0 : 1,
-    index: particles.length,
+    wavePhase: Math.random() * Math.PI * 2,
+    layer: posY < window.innerHeight * 0.5 ? 0 : 1,
   };
 }
 
-// Initialize particles
-for (let i = 0; i < PARTICLE_COUNT; i++) {
-  particles.push(spawnParticle(true));
+// Initialize particles with Poisson Disk Sampling
+const W = window.innerWidth;
+const H = window.innerHeight;
+const radius = Math.max(W, H) / (Math.sqrt(PARTICLE_COUNT) * 1.6);
+poissonPoints = poissonDiskSampling(W, H + 200, radius, 30);
+
+// If Poisson generated too few/many points, adjust
+const shuffled = [...poissonPoints].sort(() => Math.random() - 0.5);
+const selectedPoints = shuffled.slice(0, PARTICLE_COUNT);
+while (selectedPoints.length < PARTICLE_COUNT) {
+  selectedPoints.push([
+    Math.random() * W,
+    Math.random() * H
+  ]);
 }
+
+selectedPoints.forEach((pt, i) => {
+  const p = spawnParticle(pt[0], pt[1]);
+  p.el.style.opacity = String(p.baseOpacity);
+  particles.push(p);
+});
+
+// Keep some extra particles for respawn pool
+const respawnPool = [];
+for (let i = 0; i < 20; i++) {
+  respawnPool.push([
+    Math.random() * W,
+    H + 50 + Math.random() * 100
+  ]);
+}
+let respawnIdx = 0;
 
 // Mouse tracking
 document.addEventListener('mousemove', (e) => {
@@ -1141,8 +1239,6 @@ function refreshParticleColors() {
 // Main animation loop
 function animate() {
   time += 0.016;
-  const W = window.innerWidth;
-  const H = window.innerHeight;
   
   // Update all particles
   for (let i = 0; i < particles.length; i++) {
@@ -1152,25 +1248,24 @@ function animate() {
     p.wobblePhase += p.wobbleSpeed;
     p.breathPhase += p.breathSpeed;
     p.glowPhase += 0.012;
+    p.wavePhase += 0.005;
     p.rot += p.rotSpeed;
-    
-    // Calculate distance to mouse
-    const dx = mouseX - p.x;
-    const dy = mouseY - p.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
     
     // Layer offset for depth
     const layerOffset = p.layer * 0.4;
     
-    // Base opacity
-    let targetOpacity = p.baseOpacity + Math.sin(p.breathPhase) * 0.08;
+    // Base opacity with breathing
+    let targetOpacity = p.baseOpacity + Math.sin(p.breathPhase) * 0.07;
     
-    // Target scale
-    p.targetScale = 0.78 + Math.sin(p.breathPhase) * 0.28 + layerOffset * 0.15;
+    // Target scale with breathing
+    p.targetScale = 0.78 + Math.sin(p.breathPhase) * 0.28 + layerOffset * 0.12;
     
     // Mouse interaction logic
+    const dx = mouseX - p.x;
+    const dy = mouseY - p.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    
     if (isMouseOnScreen && dist < MOUSE_INFLUENCE_RADIUS) {
-      // Entering mouse area
       if (!p.nearMouse) {
         p.nearMouse = true;
         p.mouseEnterTime = Date.now();
@@ -1178,26 +1273,32 @@ function animate() {
         p.targetColor = randomColor();
       }
       
-      // Calculate influence
-      const influence = Math.pow(1 - Math.max(0, dist / MOUSE_INFLUENCE_RADIUS), 2.2);
+      const influence = Math.pow(1 - Math.max(0, dist / MOUSE_INFLUENCE_RADIUS), 1.8);
       const angle = Math.atan2(dy, dx);
       
-      // STRONG attractive force - particles gently pull towards cursor
-      const force = influence * GRAVITY_STRENGTH * (1 + layerOffset * 0.5);
-      p.vx += Math.cos(angle) * force * 0.012;
-      p.vy += Math.sin(angle) * force * 0.012;
+      // Gravitational attraction — strong pull towards cursor
+      const force = influence * GRAVITY_STRENGTH * (1 + layerOffset * 0.3);
+      p.vx += Math.cos(angle) * force * 0.025;
+      p.vy += Math.sin(angle) * force * 0.025;
       
-      // Mouse velocity influence - particles trail your movement
-      p.vx += mouseVelX * 0.06 * influence;
-      p.vy += mouseVelY * 0.06 * influence;
+      // Mouse velocity trailing — particles stream behind cursor movement
+      p.vx += mouseVelX * 0.12 * influence;
+      p.vy += mouseVelY * 0.12 * influence;
+      
+      // WAVE / RIPPLE effect — concentric waves emanating from cursor
+      const waveDist = dist / MOUSE_INFLUENCE_RADIUS;
+      const waveAngle = dist * 0.04 + p.wavePhase;
+      const waveForce = Math.sin(waveAngle) * WAVE_STRENGTH * (1 - waveDist) * 0.008;
+      const waveDir = Math.atan2(dy, dx) + Math.PI * 0.5;
+      p.vx += Math.cos(waveDir) * waveForce;
+      p.vy += Math.sin(waveDir) * waveForce;
       
       // Boost opacity and scale on hover
-      const ramp = Math.min((Date.now() - p.mouseEnterTime) / 260, 1);
-      targetOpacity = Math.min(1, p.baseOpacity + 0.45 * influence * ramp);
-      p.targetScale = 0.85 + Math.sin(p.breathPhase) * 0.35 + 0.3 * influence * ramp;
+      const ramp = Math.min((Date.now() - p.mouseEnterTime) / 200, 1);
+      targetOpacity = Math.min(0.98, p.baseOpacity + 0.4 * influence * ramp);
+      p.targetScale = 0.85 + Math.sin(p.breathPhase) * 0.32 + 0.25 * influence * ramp;
       
     } else {
-      // Leaving mouse area
       if (p.nearMouse) {
         p.nearMouse = false;
         p.targetColor = null;
@@ -1205,39 +1306,41 @@ function animate() {
     }
     
     // Apply drag/friction
-    p.vx *= FRICTION - layerOffset * 0.02;
-    p.vy *= FRICTION - layerOffset * 0.02;
+    p.vx *= FRICTION - layerOffset * 0.015;
+    p.vy *= FRICTION - layerOffset * 0.015;
     
     // Apply wobble for organic movement
-    const wobbleX = Math.sin(p.wobblePhase) * p.wobbleAmp * 0.014;
-    const wobbleY = Math.cos(p.wobblePhase * 0.73) * p.wobbleAmp * 0.006;
-    p.vx += wobbleX * (0.45 - layerOffset * 0.1);
-    p.vy += wobbleY * (0.25 - layerOffset * 0.05);
+    const wobbleX = Math.sin(p.wobblePhase) * p.wobbleAmp * 0.012;
+    const wobbleY = Math.cos(p.wobblePhase * 0.73) * p.wobbleAmp * 0.005;
+    p.vx += wobbleX * (0.4 - layerOffset * 0.08);
+    p.vy += wobbleY * (0.2 - layerOffset * 0.04);
     
     // Slight upward drift
-    p.vy -= (0.04 + layerOffset * 0.02);
+    p.vy -= (0.035 + layerOffset * 0.015);
     
     // Move particle
     p.x += p.vx;
     p.y += p.vy;
     
     // Bounce off horizontal edges
-    if (p.x < -60) {
-      p.x = -60;
+    if (p.x < -40) {
+      p.x = -40;
       p.vx *= -EDGE_BOUNCE;
     }
-    if (p.x > W + 60) {
-      p.x = W + 60;
+    if (p.x > window.innerWidth + 40) {
+      p.x = window.innerWidth + 40;
       p.vx *= -EDGE_BOUNCE;
     }
     
     // Respawn when going off top
-    if (p.y < -80) {
-      p.x = Math.random() * W;
-      p.y = H + 50 + Math.random() * 80;
-      p.vx = (Math.random() - 0.5) * 0.8;
-      p.vy = -(Math.random() * 0.6 + 0.18);
-      p.baseOpacity = Math.random() * 0.25 + 0.4;
+    if (p.y < -60) {
+      const rp = respawnPool[respawnIdx % respawnPool.length];
+      respawnIdx++;
+      p.x = rp[0];
+      p.y = rp[1];
+      p.vx = (Math.random() - 0.5) * 0.6;
+      p.vy = -(Math.random() * 0.4 + 0.12);
+      p.baseOpacity = Math.random() * 0.2 + 0.35;
       p.el.textContent = PARTICLE_ICONS[Math.floor(Math.random() * PARTICLE_ICONS.length)];
       p.el.style.color = randomColor();
       p.originalColor = p.el.style.color;
@@ -1246,35 +1349,27 @@ function animate() {
       p.layer = Math.random() > 0.5 ? 0 : 1;
     }
     
-    // Smooth interpolations
+    // Smooth scale interpolation
     p.scale = lerp(p.scale, p.targetScale, 0.06);
     const currentOpacity = parseFloat(p.el.style.opacity) || p.baseOpacity;
-    p.el.style.opacity = String(lerp(currentOpacity, targetOpacity, 0.08));
+    p.el.style.opacity = String(lerp(currentOpacity, targetOpacity, 0.07));
     
     // Glow effect based on distance to mouse
     let glowIntensity = 0;
     if (isMouseOnScreen && dist < MOUSE_INFLUENCE_RADIUS * 0.85) {
-      glowIntensity = Math.pow(1 - Math.max(0, dist / (MOUSE_INFLUENCE_RADIUS * 0.85)), 2.5) * 0.5;
+      glowIntensity = Math.pow(1 - Math.max(0, dist / (MOUSE_INFLUENCE_RADIUS * 0.85)), 2.5) * 0.4;
     }
-    glowIntensity += Math.sin(p.glowPhase) * 0.03 + 0.02;
+    glowIntensity += Math.sin(p.glowPhase) * 0.02 + 0.01;
     
-    // Update DOM transform
-    const scaleX = p.scale;
-    const scaleY = p.scale;
-    const transX = p.x;
-    const transY = p.y;
-    const rotation = p.rot;
-    
-    // Apply glow as filter shadow
+    // Update DOM
     let filterStr = '';
     if (glowIntensity > 0.01) {
-      const blurRadius = 6 + glowIntensity * 18;
+      const blurRadius = 4 + glowIntensity * 14;
       filterStr = `drop-shadow(0 0 ${blurRadius}px ${p.el.style.color})`;
     }
     p.el.style.filter = filterStr || 'none';
     
-    // Combined transform
-    p.el.style.transform = `translate3d(${transX}px, ${transY}px, ${p.layer * 30}px) rotate(${rotation}rad) scale(${scaleX}, ${scaleY})`;
+    p.el.style.transform = `translate3d(${p.x}px, ${p.y}px, ${p.layer * 30}px) rotate(${p.rot}rad) scale(${p.scale}, ${p.scale})`;
   }
   
   requestAnimationFrame(animate);

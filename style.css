@@ -1,7 +1,7 @@
 /* ─── CSS Variables ─────────────────────────────────────────────────── */
 :root {
-  --bg-primary:    #0a0a0f;
-  --bg-secondary:  #111118;
+  --bg-primary:    #1a1a24;
+  --bg-secondary:  #22222e;
   --glass-bg:      rgba(255,255,255,0.06);
   --glass-border:  rgba(255,255,255,0.14);
   --glass-hover:   rgba(255,255,255,0.11);
@@ -35,11 +35,11 @@
   --letter-spacing-body: -0.01em;
   --letter-spacing-heading: -0.02em;
 
-  --modal-bg:            rgba(18,18,28,0.82);
-  --modal-border:        rgba(255,255,247,0.18);
-  --modal-shadow:        0 32px 96px rgba(0,0,0,0.7), 0 1px 0 rgba(255,255,255,0.1) inset;
-  --modal-shine:         linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-  --overlay-bg:          rgba(0,0,0,0.65);
+  --modal-bg:            rgba(18,18,28,0.55);
+  --modal-border:        rgba(255,255,247,0.12);
+  --modal-shadow:        0 24px 64px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.06) inset;
+  --modal-shine:         linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  --overlay-bg:          rgba(0,0,0,0.4);
   --tooltip-bg:          rgba(20,20,30,0.9);
   --tooltip-border:      rgba(255,255,247,0.14);
   --scrollbar-thumb:     rgba(255,255,247,0.12);
@@ -85,11 +85,11 @@
   --text-muted:    rgba(0,0,0,0.38);
   --shadow-glass:  0 4px 20px rgba(0,0,0,0.07), 0 1px 0 rgba(255,255,255,0.6) inset;
   --shadow-hover:  0 12px 36px rgba(0,0,0,0.12), 0 1px 0 rgba(255,255,255,0.8) inset;
-  --modal-bg:            rgba(255,255,255,0.88);
-  --modal-border:        rgba(0,0,0,0.12);
-  --modal-shadow:        0 24px 80px rgba(0,0,0,0.15), 0 1px 0 rgba(255,255,255,0.5) inset;
-  --modal-shine:         linear-gradient(90deg, transparent, rgba(0,0,0,0.08), transparent);
-  --overlay-bg:          rgba(0,0,0,0.25);
+  --modal-bg:            rgba(255,255,255,0.72);
+  --modal-border:        rgba(0,0,0,0.08);
+  --modal-shadow:        0 16px 48px rgba(0,0,0,0.08), 0 1px 0 rgba(255,255,255,0.4) inset;
+  --modal-shine:         linear-gradient(90deg, transparent, rgba(0,0,0,0.04), transparent);
+  --overlay-bg:          rgba(0,0,0,0.15);
   --tooltip-bg:          rgba(255,255,255,0.94);
   --tooltip-border:      rgba(0,0,0,0.12);
   --scrollbar-thumb:     rgba(0,0,0,0.12);
@@ -591,8 +591,8 @@ body {
 .modal-overlay {
   position: fixed; inset: 0; z-index: 100;
   background: var(--overlay-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex; align-items: center; justify-content: center;
   padding: 16px;
   opacity: 0; pointer-events: none;
@@ -610,8 +610,8 @@ body {
   border-radius: var(--radius-lg);
   border: 1px solid var(--modal-border);
   background: var(--modal-bg);
-  backdrop-filter: url('#liquid-glass-realtime') blur(1px) contrast(1.08) saturate(1.06);
-  -webkit-backdrop-filter: url('#liquid-glass-realtime') blur(1px) contrast(1.08) saturate(1.06);
+  backdrop-filter: url('#liquid-glass-realtime') blur(0.5px) contrast(1.04) saturate(1.03);
+  -webkit-backdrop-filter: url('#liquid-glass-realtime') blur(0.5px) contrast(1.04) saturate(1.03);
   box-shadow: var(--modal-shadow);
   overflow: hidden;
   display: grid;

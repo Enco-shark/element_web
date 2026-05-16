@@ -957,16 +957,273 @@ function onTouchMove(e) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   ⭐ ANTIGRAVITY PARTICLE SYSTEM — WebGL Shader · 118 Elements · Fluid Field
-   GPU-accelerated via WebGL 2.0 Vertex + Fragment Shaders
-   Replaces legacy Canvas 2D particle renderer for superior performance
+   ⭐ ANTIGRAVITY PARTICLE SYSTEM — Canvas · 118 Elements · Fluid Field
 ═══════════════════════════════════════════════════════════════════════ */
 
-function refreshParticleColors() {
-  if (typeof WebGLParticleSystem !== 'undefined') {
-    WebGLParticleSystem.refreshColors(currentTheme);
+const _SYMBOLS = [
+  'H','He','Li','Be','B','C','N','O','F','Ne',
+  'Na','Mg','Al','Si','P','S','Cl','Ar','K','Ca',
+  'Sc','Ti','V','Cr','Mn','Fe','Co','Ni','Cu','Zn',
+  'Ga','Ge','As','Se','Br','Kr','Rb','Sr','Y','Zr',
+  'Nb','Mo','Tc','Ru','Rh','Pd','Ag','Cd','In','Sn',
+  'Sb','Te','I','Xe','Cs','Ba','La','Ce','Pr','Nd',
+  'Pm','Sm','Eu','Gd','Tb','Dy','Ho','Er','Tm','Yb',
+  'Lu','Hf','Ta','W','Re','Os','Ir','Pt','Au','Hg',
+  'Tl','Pb','Bi','Po','At','Rn','Fr','Ra','Ac','Th',
+  'Pa','U','Np','Pu','Am','Cm','Bk','Cf','Es','Fm',
+  'Md','No','Lr','Rf','Db','Sg','Bh','Hs','Mt','Ds',
+  'Rg','Cn','Nh','Fl','Mc','Lv','Ts','Og'
+];
+
+const _CD = ['#6a9df6','#80cbc4','#ffb366','#f08f8f','#9e9eff','#ce93d8','#67d1ed','#ffecb3','#ff8a80','#a5d6a7','#82b1ff','#ea80fc','#b9f6ca','#b388ff','#8c9eff','#84ffff','#ff80ab','#ccff90','#ffd740','#69f0ae','#40c4ff','#e040fb','#ff6e40','#bcaaa4'];
+const _CL = ['#1a73e8','#34a853','#f48024','#db4437','#4285f4','#8e44ad','#1aadcf','#ffc107','#e53935','#43a047','#1e88e5','#8e24aa','#00acc1','#3949ab','#7cb342','#00bcd4','#d81b60','#689f38','#ffb300','#00897b','#0288d1','#ab47bc','#f4511e','#78909c'];
+
+const _canvas = document.createElement("canvas");
+_canvas.id = "particleCanvas";
+document.body.appendChild(_canvas);
+const _ctx = _canvas.getContext("2d");
+
+let _W = innerWidth;
+let _H = innerHeight;
+const _DPR = devicePixelRatio || 1;
+_canvas.width = _W * _DPR;
+_canvas.height = _H * _DPR;
+_canvas.style.width = _W + "px";
+_canvas.style.height = _H + "px";
+_ctx.setTransform(_DPR, 0, 0, _DPR, 0, 0);
+
+let _particles = [];
+let _particlesReady = false;
+
+const _mouse = { x: _W / 2, y: _H / 2, vx: 0, vy: 0 };
+
+window.addEventListener("mousemove", e => {
+  _mouse.vx = e.clientX - _mouse.x;
+  _mouse.vy = e.clientY - _mouse.y;
+  _mouse.x = e.clientX;
+  _mouse.y = e.clientY;
+});
+
+window.addEventListener("resize", () => {
+  _W = innerWidth;
+  _H = innerHeight;
+  _canvas.width = _W * _DPR;
+  _canvas.height = _H * _DPR;
+  _ctx.setTransform(_DPR, 0, 0, _DPR, 0, 0);
+  _generateParticles();
+});
+
+const _MAX_PARTICLES = 200;
+const _INITIAL_COUNT = 118;
+
+// ─── Multi-frequency flow noise (Google-style organic field) ──────────
+function _flowX(x, y, t) {
+  return Math.sin(x * 0.002 + t * 0.18 + y * 0.0015) * 0.7
+       + Math.sin(x * 0.001 + t * 0.12 + y * 0.003) * 0.5
+       + Math.cos(x * 0.003 + t * 0.08 + y * 0.001) * 0.3;
+}
+function _flowY(x, y, t) {
+  return Math.cos(y * 0.002 + t * 0.15 + x * 0.0015) * 0.7
+       + Math.cos(y * 0.001 + t * 0.10 + x * 0.003) * 0.5
+       + Math.sin(y * 0.003 + t * 0.06 + x * 0.001) * 0.3;
+}
+
+class _AParticle {
+  constructor(x, y, symIdx) {
+    this.bx = x; this.by = y;
+    this.x = x; this.y = y;
+    this.vx = 0; this.vy = 0;
+
+    this.sz = 8 + Math.random() * 16;
+    this.ci = symIdx % _CD.length;
+    this.alp = 0.2 + Math.random() * 0.2;
+    this.targetAlp = 0;
+    this.lifetime = 8000 + Math.random() * 10000;
+    this.birth = performance.now();
+    this.symIdx = symIdx;
+    this.alive = true;
+    this.noise = Math.random() * Math.PI * 2;
+  }
+
+  update(ctx, t, mx, my) {
+    if (!this.alive) return;
+
+    const age = performance.now() - this.birth;
+    if (age < 400) {
+      this.targetAlp = this.alp * (age / 400);
+    } else if (age > this.lifetime - 800) {
+      this.targetAlp = this.alp * ((this.lifetime - age) / 800);
+      if (age >= this.lifetime) { this.alive = false; return; }
+    } else {
+      this.targetAlp = this.alp;
+    }
+    ctx.globalAlpha = Math.max(0, this.targetAlp);
+
+    const dx = mx - this.x, dy = my - this.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    // Antigravity — particles pushed away from mouse
+    if (dist < 260 && dist > 1) {
+      const force = (260 - dist) / 260;
+      this.vx -= (dx / dist) * force * 0.4;
+      this.vy -= (dy / dist) * force * 0.4;
+    }
+
+    // Multi-frequency flow field (Google-style organic noise)
+    this.vx += _flowX(this.x, this.y, t) * 0.012;
+    this.vy += _flowY(this.x, this.y, t) * 0.012;
+
+    // Spring back to base position
+    this.vx += (this.bx - this.x) * 0.0006;
+    this.vy += (this.by - this.y) * 0.0006;
+
+    // Damping
+    this.vx *= 0.94;
+    this.vy *= 0.94;
+
+    this.x += this.vx;
+    this.y += this.vy;
+
+    ctx.fillStyle = _CURRENT_COLORS[this.ci];
+    ctx.fillText(_SYMBOLS[this.symIdx], this.x, this.y);
   }
 }
+
+let _CURRENT_COLORS = _CD;
+
+function _spawnParticle() {
+  const x = Math.random() * _W;
+  const y = Math.random() * _H;
+  const si = (Math.random() * _SYMBOLS.length) | 0;
+  const p = new _AParticle(x, y, si);
+  p.bx = x;
+  p.by = y;
+  _particles.push(p);
+}
+
+function _drawParticles(theme, t) {
+  const ctx = _ctx, isDark = theme === "dark";
+  _CURRENT_COLORS = isDark ? _CD : _CL;
+  const mx = _mouse.x, my = _mouse.y;
+
+  // Semi-transparent clear — persistence trail (Google style)
+  ctx.fillStyle = isDark ? "rgba(10,10,15,0.15)" : "rgba(240,242,245,0.15)";
+  ctx.fillRect(0, 0, _W, _H);
+
+  // Draw with shadow
+  ctx.shadowBlur = 12;
+  ctx.shadowColor = isDark ? "rgba(79,195,247,0.4)" : "rgba(66,133,244,0.3)";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.font = "600 13px Inter, Nunito, system-ui, sans-serif";
+
+  const dead = [];
+  for (let i = 0; i < _particles.length; i++) {
+    const p = _particles[i];
+    if (!p.alive) { dead.push(i); continue; }
+    p.update(ctx, t, mx, my);
+  }
+  for (const di of dead.sort((a, b) => b - a)) _particles.splice(di, 1);
+  while (_particles.length < _MAX_PARTICLES) _spawnParticle();
+
+  ctx.globalAlpha = 1;
+  ctx.shadowBlur = 0;
+
+  // Connection lines — spatial grid culled
+  const _GCELL = 75, MAX_SQ = 5000;
+  const _gcols = (_W / _GCELL + 1) | 0;
+  const _grid = {};
+  for (let i = 0; i < _particles.length; i++) {
+    const p = _particles[i];
+    if (!p.alive) continue;
+    const gi = ((p.x / _GCELL) | 0) + ((p.y / _GCELL) | 0) * _gcols;
+    if (!_grid[gi]) _grid[gi] = [];
+    _grid[gi].push(i);
+  }
+
+  ctx.beginPath();
+  let lc = 0;
+  for (let i = 0; i < _particles.length; i++) {
+    if (!_particles[i].alive) continue;
+    const a = _particles[i];
+    const gi = ((a.x / _GCELL) | 0) + ((a.y / _GCELL) | 0) * _gcols;
+    for (let ox = -1; ox <= 1; ox++) for (let oy = -1; oy <= 1; oy++) {
+      const cell = _grid[gi + ox + oy * _gcols]; if (!cell) continue;
+      for (let ci = 0; ci < cell.length; ci++) {
+        const j = cell[ci]; if (j <= i) continue;
+        if (!_particles[j].alive) continue;
+        const b = _particles[j], dx = a.x - b.x, dy = a.y - b.y;
+        if (dx * dx + dy * dy < MAX_SQ) { ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); lc++; }
+      }
+    }
+  }
+  if (lc > 0) {
+    ctx.strokeStyle = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)";
+    ctx.lineWidth = 0.4; ctx.stroke();
+  }
+}
+
+function _animate(t) {
+  if (_particlesReady) { _drawParticles(currentTheme, t); }
+  requestAnimationFrame(_animate);
+}
+
+// Assign Worker source and init
+const _WORKER_SRC2 = `
+self.onmessage = (e) => {
+  const { width, height, radius, count } = e.data;
+  const k = 30, r2 = radius * radius, cs = radius / 1.4142;
+  const gw = Math.ceil(width / cs), gh = Math.ceil(height / cs);
+  const grid = new Array(gw * gh), act = [], pts = [];
+  function ins(p) { pts.push(p); act.push(p); grid[(p.x / cs) | 0 + (p.y / cs) | 0 * gw] = p; }
+  function far(x, y) {
+    const gx = (x / cs) | 0, gy = (y / cs) | 0;
+    for (let i = -2; i <= 2; i++) for (let j = -2; j <= 2; j++) {
+      const nx = gx + i, ny = gy + j;
+      if (nx < 0 || ny < 0 || nx >= gw || ny >= gh) continue;
+      const n = grid[nx + ny * gw];
+      if (n) { const dx = n.x - x, dy = n.y - y; if (dx * dx + dy * dy < r2) return false; }
+    }
+    return true;
+  }
+  for (let s = 0; s < 18; s++) ins({ x: Math.random() * width, y: Math.random() * height });
+  while (act.length && pts.length < count) {
+    const ri = (Math.random() * act.length) | 0, p = act[ri];
+    let found = false;
+    for (let n = 0; n < k; n++) {
+      const a = Math.random() * 6.2832, m = radius * (1 + Math.random());
+      const x = p.x + Math.cos(a) * m, y = p.y + Math.sin(a) * m;
+      if (x >= 0 && y >= 0 && x < width && y < height && far(x, y)) { ins({ x, y }); found = true; break; }
+    }
+    if (!found) act.splice(ri, 1);
+  }
+  self.postMessage(pts);
+};
+`;
+
+function _generateParticles() {
+  try {
+    _particlesReady = false;
+    const blob = new Blob([_WORKER_SRC2], { type: 'text/javascript' });
+    const wrk = new Worker(URL.createObjectURL(blob));
+    wrk.postMessage({ width: innerWidth, height: innerHeight, radius: 100, count: _INITIAL_COUNT });
+    wrk.onmessage = e => {
+      const pts = e.data;
+      _particles = [];
+      for (let i = 0; i < pts.length && i < _INITIAL_COUNT; i++)
+        _particles.push(new _AParticle(pts[i].x, pts[i].y, i % _SYMBOLS.length));
+      _particlesReady = true;
+      wrk.terminate();
+    };
+  } catch(e) {
+    console.error('Particle Worker error:', e);
+    _particlesReady = true; // fallback so page still works
+  }
+}
+
+_generateParticles();
+requestAnimationFrame(_animate);
+
+function refreshParticleColors() {}
 
 
 /* ═══════════════════════════════════════════════════════════════════════

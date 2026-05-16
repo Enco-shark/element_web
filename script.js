@@ -1,1234 +1,969 @@
-/* ═══════════════════════════════════════════════════════════════════════
-   ELEMENT DATA — 118 Elements
-═══════════════════════════════════════════════════════════════════════ */
+/* ============================================================
+   THEME TOGGLE
+   ============================================================ */
+const themeToggle = document.getElementById('theme-toggle');
+const root = document.documentElement;
+
+const savedTheme = localStorage.getItem('pt-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+
+themeToggle.addEventListener('click', () => {
+    const dark = root.getAttribute('data-theme') === 'dark';
+    root.setAttribute('data-theme', dark ? 'light' : 'dark');
+    localStorage.setItem('pt-theme', dark ? 'light' : 'dark');
+});
+
+/* ============================================================
+   I18N — INTERNATIONALIZATION
+   ============================================================ */
+let currentLang = localStorage.getItem('pt-lang') || 'en';
+
+const I18N = {
+    en: {
+        title: "Periodic Table of Elements",
+        atomLabel: "Drag to rotate",
+        atomicNumber: "Atomic Number",
+        atomicMass: "Atomic Mass",
+        category: "Category",
+        yearDiscovered: "Year Discovered",
+        ancient: "Ancient",
+        electronConfig: "Electron Configuration",
+        electronShells: "Electron Shells",
+        modeBohr: "Bohr",
+        modeOrbital: "Orbital",
+        elementPrefix: "Element",
+        categories: {
+            "alkali-metal": "Alkali Metals",
+            "alkaline-earth-metal": "Alkaline Earth Metals",
+            "transition-metal": "Transition Metals",
+            "post-transition-metal": "Post-transition Metals",
+            "metalloid": "Metalloids",
+            "nonmetal": "Nonmetals",
+            "halogen": "Halogens",
+            "noble-gas": "Noble Gases",
+            "lanthanide": "Lanthanides",
+            "actinide": "Actinides"
+        },
+        elements: {
+            1:"Hydrogen",2:"Helium",3:"Lithium",4:"Beryllium",5:"Boron",
+            6:"Carbon",7:"Nitrogen",8:"Oxygen",9:"Fluorine",10:"Neon",
+            11:"Sodium",12:"Magnesium",13:"Aluminium",14:"Silicon",15:"Phosphorus",
+            16:"Sulfur",17:"Chlorine",18:"Argon",19:"Potassium",20:"Calcium",
+            21:"Scandium",22:"Titanium",23:"Vanadium",24:"Chromium",25:"Manganese",
+            26:"Iron",27:"Cobalt",28:"Nickel",29:"Copper",30:"Zinc",
+            31:"Gallium",32:"Germanium",33:"Arsenic",34:"Selenium",35:"Bromine",
+            36:"Krypton",37:"Rubidium",38:"Strontium",39:"Yttrium",40:"Zirconium",
+            41:"Niobium",42:"Molybdenum",43:"Technetium",44:"Ruthenium",45:"Rhodium",
+            46:"Palladium",47:"Silver",48:"Cadmium",49:"Indium",50:"Tin",
+            51:"Antimony",52:"Tellurium",53:"Iodine",54:"Xenon",55:"Cesium",
+            56:"Barium",57:"Lanthanum",58:"Cerium",59:"Praseodymium",60:"Neodymium",
+            61:"Promethium",62:"Samarium",63:"Europium",64:"Gadolinium",65:"Terbium",
+            66:"Dysprosium",67:"Holmium",68:"Erbium",69:"Thulium",70:"Ytterbium",
+            71:"Lutetium",72:"Hafnium",73:"Tantalum",74:"Tungsten",75:"Rhenium",
+            76:"Osmium",77:"Iridium",78:"Platinum",79:"Gold",80:"Mercury",
+            81:"Thallium",82:"Lead",83:"Bismuth",84:"Polonium",85:"Astatine",
+            86:"Radon",87:"Francium",88:"Radium",89:"Actinium",90:"Thorium",
+            91:"Protactinium",92:"Uranium",93:"Neptunium",94:"Plutonium",95:"Americium",
+            96:"Curium",97:"Berkelium",98:"Californium",99:"Einsteinium",100:"Fermium",
+            101:"Mendelevium",102:"Nobelium",103:"Lawrencium",104:"Rutherfordium",105:"Dubnium",
+            106:"Seaborgium",107:"Bohrium",108:"Hassium",109:"Meitnerium",110:"Darmstadtium",
+            111:"Roentgenium",112:"Copernicium",113:"Nihonium",114:"Flerovium",115:"Moscovium",
+            116:"Livermorium",117:"Tennessine",118:"Oganesson"
+        }
+    },
+    zh: {
+        title: "元素周期表",
+        atomLabel: "拖拽旋转",
+        atomicNumber: "原子序数",
+        atomicMass: "原子量",
+        category: "分类",
+        yearDiscovered: "发现年份",
+        ancient: "古代",
+        electronConfig: "电子排布",
+        electronShells: "电子层",
+        modeBohr: "玻尔",
+        modeOrbital: "轨道",
+        elementPrefix: "第",
+        categories: {
+            "alkali-metal": "碱金属",
+            "alkaline-earth-metal": "碱土金属",
+            "transition-metal": "过渡金属",
+            "post-transition-metal": "后过渡金属",
+            "metalloid": "准金属",
+            "nonmetal": "非金属",
+            "halogen": "卤素",
+            "noble-gas": "稀有气体",
+            "lanthanide": "镧系元素",
+            "actinide": "锕系元素"
+        },
+        elements: {
+            1:"氢",2:"氦",3:"锂",4:"铍",5:"硼",
+            6:"碳",7:"氮",8:"氧",9:"氟",10:"氖",
+            11:"钠",12:"镁",13:"铝",14:"硅",15:"磷",
+            16:"硫",17:"氯",18:"氩",19:"钾",20:"钙",
+            21:"钪",22:"钛",23:"钒",24:"铬",25:"锰",
+            26:"铁",27:"钴",28:"镍",29:"铜",30:"锌",
+            31:"镓",32:"锗",33:"砷",34:"硒",35:"溴",
+            36:"氪",37:"铷",38:"锶",39:"钇",40:"锆",
+            41:"铌",42:"钼",43:"锝",44:"钌",45:"铑",
+            46:"钯",47:"银",48:"镉",49:"铟",50:"锡",
+            51:"锑",52:"碲",53:"碘",54:"氙",55:"铯",
+            56:"钡",57:"镧",58:"铈",59:"镨",60:"钕",
+            61:"钷",62:"钐",63:"铕",64:"钆",65:"铽",
+            66:"镝",67:"钬",68:"铒",69:"铥",70:"镱",
+            71:"镥",72:"铪",73:"钽",74:"钨",75:"铼",
+            76:"锇",77:"铱",78:"铂",79:"金",80:"汞",
+            81:"铊",82:"铅",83:"铋",84:"钋",85:"砹",
+            86:"氡",87:"钫",88:"镭",89:"锕",90:"钍",
+            91:"镤",92:"铀",93:"镎",94:"钚",95:"镅",
+            96:"锔",97:"锫",98:"锎",99:"锿",100:"镄",
+            101:"钔",102:"锘",103:"铹",104:"鑪",105:"𨧀",
+            106:"𨭎",107:"𨨏",108:"𨭆",109:"鿏",110:"鐽",
+            111:"錀",112:"鿔",113:"鿭",114:"𫓧",115:"镆",
+            116:"𫟷",117:"鿬",118:"鿫"
+        }
+    }
+};
+
+function t(key) { return I18N[currentLang][key]; }
+function getElementName(z) { return I18N[currentLang].elements[z]; }
+function getCategoryLabel(cat) { return I18N[currentLang].categories[cat] || cat; }
+
+/* ============================================================
+   ELEMENT DATA — ALL 118 ELEMENTS
+   ============================================================ */
 const ELEMENTS = [
-  { z:1, sym:"H", name:"Hydrogen", name_zh:"氢", mass:"1.008", cat:"nonmetal", state:"gas", year:1766, config:"1s¹", group:1, period:1 },
-  { z:2, sym:"He", name:"Helium", name_zh:"氦", mass:"4.003", cat:"noble-gas", state:"gas", year:1898, config:"1s²", group:18, period:1 },
-  { z:3, sym:"Li", name:"Lithium", name_zh:"锂", mass:"6.941", cat:"alkali", state:"solid", year:1817, config:"[He] 2s¹", group:1, period:2 },
-  { z:4, sym:"Be", name:"Beryllium", name_zh:"铍", mass:"9.012", cat:"alkaline", state:"solid", year:1798, config:"[He] 2s²", group:2, period:2 },
-  { z:5, sym:"B", name:"Boron", name_zh:"硼", mass:"10.81", cat:"metalloid", state:"solid", year:1808, config:"[He] 2s² 2p¹", group:13, period:2 },
-  { z:6, sym:"C", name:"Carbon", name_zh:"碳", mass:"12.011", cat:"nonmetal", state:"solid", year:null, config:"[He] 2s² 2p²", group:14, period:2 },
-  { z:7, sym:"N", name:"Nitrogen", name_zh:"氮", mass:"14.007", cat:"nonmetal", state:"gas", year:1772, config:"[He] 2s² 2p³", group:15, period:2 },
-  { z:8, sym:"O", name:"Oxygen", name_zh:"氧", mass:"15.999", cat:"nonmetal", state:"gas", year:1774, config:"[He] 2s² 2p⁴", group:16, period:2 },
-  { z:9, sym:"F", name:"Fluorine", name_zh:"氟", mass:"18.998", cat:"halogen", state:"gas", year:1886, config:"[He] 2s² 2p⁵", group:17, period:2 },
-  { z:10, sym:"Ne", name:"Neon", name_zh:"氖", mass:"20.180", cat:"noble-gas", state:"gas", year:1898, config:"[He] 2s² 2p⁶", group:18, period:2 },
-  { z:11, sym:"Na", name:"Sodium", name_zh:"钠", mass:"22.990", cat:"alkali", state:"solid", year:1807, config:"[Ne] 3s¹", group:1, period:3 },
-  { z:12, sym:"Mg", name:"Magnesium", name_zh:"镁", mass:"24.305", cat:"alkaline", state:"solid", year:1755, config:"[Ne] 3s²", group:2, period:3 },
-  { z:13, sym:"Al", name:"Aluminium", name_zh:"铝", mass:"26.982", cat:"post-trans", state:"solid", year:1825, config:"[Ne] 3s² 3p¹", group:13, period:3 },
-  { z:14, sym:"Si", name:"Silicon", name_zh:"硅", mass:"28.086", cat:"metalloid", state:"solid", year:1824, config:"[Ne] 3s² 3p²", group:14, period:3 },
-  { z:15, sym:"P", name:"Phosphorus", name_zh:"磷", mass:"30.974", cat:"nonmetal", state:"solid", year:1669, config:"[Ne] 3s² 3p³", group:15, period:3 },
-  { z:16, sym:"S", name:"Sulfur", name_zh:"硫", mass:"32.06", cat:"nonmetal", state:"solid", year:null, config:"[Ne] 3s² 3p⁴", group:16, period:3 },
-  { z:17, sym:"Cl", name:"Chlorine", name_zh:"氯", mass:"35.45", cat:"halogen", state:"gas", year:1774, config:"[Ne] 3s² 3p⁵", group:17, period:3 },
-  { z:18, sym:"Ar", name:"Argon", name_zh:"氩", mass:"39.948", cat:"noble-gas", state:"gas", year:1894, config:"[Ne] 3s² 3p⁶", group:18, period:3 },
-  { z:19, sym:"K", name:"Potassium", name_zh:"钾", mass:"39.098", cat:"alkali", state:"solid", year:1807, config:"[Ar] 4s¹", group:1, period:4 },
-  { z:20, sym:"Ca", name:"Calcium", name_zh:"钙", mass:"40.078", cat:"alkaline", state:"solid", year:1808, config:"[Ar] 4s²", group:2, period:4 },
-  { z:21, sym:"Sc", name:"Scandium", name_zh:"钪", mass:"44.956", cat:"transition", state:"solid", year:1879, config:"[Ar] 3d¹ 4s²", group:3, period:4 },
-  { z:22, sym:"Ti", name:"Titanium", name_zh:"钛", mass:"47.867", cat:"transition", state:"solid", year:1791, config:"[Ar] 3d² 4s²", group:4, period:4 },
-  { z:23, sym:"V", name:"Vanadium", name_zh:"钒", mass:"50.942", cat:"transition", state:"solid", year:1801, config:"[Ar] 3d³ 4s²", group:5, period:4 },
-  { z:24, sym:"Cr", name:"Chromium", name_zh:"铬", mass:"51.996", cat:"transition", state:"solid", year:1798, config:"[Ar] 3d⁵ 4s¹", group:6, period:4 },
-  { z:25, sym:"Mn", name:"Manganese", name_zh:"锰", mass:"54.938", cat:"transition", state:"solid", year:1774, config:"[Ar] 3d⁵ 4s²", group:7, period:4 },
-  { z:26, sym:"Fe", name:"Iron", name_zh:"铁", mass:"55.845", cat:"transition", state:"solid", year:null, config:"[Ar] 3d⁶ 4s²", group:8, period:4 },
-  { z:27, sym:"Co", name:"Cobalt", name_zh:"钴", mass:"58.933", cat:"transition", state:"solid", year:1735, config:"[Ar] 3d⁷ 4s²", group:9, period:4 },
-  { z:28, sym:"Ni", name:"Nickel", name_zh:"镍", mass:"58.693", cat:"transition", state:"solid", year:1751, config:"[Ar] 3d⁸ 4s²", group:10, period:4 },
-  { z:29, sym:"Cu", name:"Copper", name_zh:"铜", mass:"63.546", cat:"transition", state:"solid", year:null, config:"[Ar] 3d¹⁰ 4s¹", group:11, period:4 },
-  { z:30, sym:"Zn", name:"Zinc", name_zh:"锌", mass:"65.38", cat:"transition", state:"solid", year:null, config:"[Ar] 3d¹⁰ 4s²", group:12, period:4 },
-  { z:31, sym:"Ga", name:"Gallium", name_zh:"镓", mass:"69.723", cat:"post-trans", state:"solid", year:1875, config:"[Ar] 3d¹⁰ 4s² 4p¹", group:13, period:4 },
-  { z:32, sym:"Ge", name:"Germanium", name_zh:"锗", mass:"72.630", cat:"metalloid", state:"solid", year:1886, config:"[Ar] 3d¹⁰ 4s² 4p²", group:14, period:4 },
-  { z:33, sym:"As", name:"Arsenic", name_zh:"砷", mass:"74.922", cat:"metalloid", state:"solid", year:null, config:"[Ar] 3d¹⁰ 4s² 4p³", group:15, period:4 },
-  { z:34, sym:"Se", name:"Selenium", name_zh:"硒", mass:"78.971", cat:"nonmetal", state:"solid", year:1817, config:"[Ar] 3d¹⁰ 4s² 4p⁴", group:16, period:4 },
-  { z:35, sym:"Br", name:"Bromine", name_zh:"溴", mass:"79.904", cat:"halogen", state:"liquid", year:1826, config:"[Ar] 3d¹⁰ 4s² 4p⁵", group:17, period:4 },
-  { z:36, sym:"Kr", name:"Krypton", name_zh:"氪", mass:"83.798", cat:"noble-gas", state:"gas", year:1898, config:"[Ar] 3d¹⁰ 4s² 4p⁶", group:18, period:4 },
-  { z:37, sym:"Rb", name:"Rubidium", name_zh:"铷", mass:"85.468", cat:"alkali", state:"solid", year:1861, config:"[Kr] 5s¹", group:1, period:5 },
-  { z:38, sym:"Sr", name:"Strontium", name_zh:"锶", mass:"87.62", cat:"alkaline", state:"solid", year:1790, config:"[Kr] 5s²", group:2, period:5 },
-  { z:39, sym:"Y", name:"Yttrium", name_zh:"钇", mass:"88.906", cat:"transition", state:"solid", year:1794, config:"[Kr] 4d¹ 5s²", group:3, period:5 },
-  { z:40, sym:"Zr", name:"Zirconium", name_zh:"锆", mass:"91.224", cat:"transition", state:"solid", year:1789, config:"[Kr] 4d² 5s²", group:4, period:5 },
-  { z:41, sym:"Nb", name:"Niobium", name_zh:"铌", mass:"92.906", cat:"transition", state:"solid", year:1801, config:"[Kr] 4d⁴ 5s¹", group:5, period:5 },
-  { z:42, sym:"Mo", name:"Molybdenum", name_zh:"钼", mass:"95.96", cat:"transition", state:"solid", year:1778, config:"[Kr] 4d⁵ 5s¹", group:6, period:5 },
-  { z:43, sym:"Tc", name:"Technetium", name_zh:"锝", mass:"[98]", cat:"transition", state:"solid", year:1937, config:"[Kr] 4d⁵ 5s²", group:7, period:5 },
-  { z:44, sym:"Ru", name:"Ruthenium", name_zh:"钌", mass:"101.07", cat:"transition", state:"solid", year:1844, config:"[Kr] 4d⁷ 5s¹", group:8, period:5 },
-  { z:45, sym:"Rh", name:"Rhodium", name_zh:"铑", mass:"102.91", cat:"transition", state:"solid", year:1803, config:"[Kr] 4d⁸ 5s¹", group:9, period:5 },
-  { z:46, sym:"Pd", name:"Palladium", name_zh:"钯", mass:"106.42", cat:"transition", state:"solid", year:1803, config:"[Kr] 4d¹⁰", group:10, period:5 },
-  { z:47, sym:"Ag", name:"Silver", name_zh:"银", mass:"107.87", cat:"transition", state:"solid", year:null, config:"[Kr] 4d¹⁰ 5s¹", group:11, period:5 },
-  { z:48, sym:"Cd", name:"Cadmium", name_zh:"镉", mass:"112.41", cat:"transition", state:"solid", year:1817, config:"[Kr] 4d¹⁰ 5s²", group:12, period:5 },
-  { z:49, sym:"In", name:"Indium", name_zh:"铟", mass:"114.82", cat:"post-trans", state:"solid", year:1863, config:"[Kr] 4d¹⁰ 5s² 5p¹", group:13, period:5 },
-  { z:50, sym:"Sn", name:"Tin", name_zh:"锡", mass:"118.71", cat:"post-trans", state:"solid", year:null, config:"[Kr] 4d¹⁰ 5s² 5p²", group:14, period:5 },
-  { z:51, sym:"Sb", name:"Antimony", name_zh:"锑", mass:"121.76", cat:"metalloid", state:"solid", year:null, config:"[Kr] 4d¹⁰ 5s² 5p³", group:15, period:5 },
-  { z:52, sym:"Te", name:"Tellurium", name_zh:"碲", mass:"127.60", cat:"metalloid", state:"solid", year:1782, config:"[Kr] 4d¹⁰ 5s² 5p⁴", group:16, period:5 },
-  { z:53, sym:"I", name:"Iodine", name_zh:"碘", mass:"126.90", cat:"halogen", state:"solid", year:1811, config:"[Kr] 4d¹⁰ 5s² 5p⁵", group:17, period:5 },
-  { z:54, sym:"Xe", name:"Xenon", name_zh:"氙", mass:"131.29", cat:"noble-gas", state:"gas", year:1898, config:"[Kr] 4d¹⁰ 5s² 5p⁶", group:18, period:5 },
-  { z:55, sym:"Cs", name:"Cesium", name_zh:"铯", mass:"132.91", cat:"alkali", state:"solid", year:1860, config:"[Xe] 6s¹", group:1, period:6 },
-  { z:56, sym:"Ba", name:"Barium", name_zh:"钡", mass:"137.33", cat:"alkaline", state:"solid", year:1808, config:"[Xe] 6s²", group:2, period:6 },
-  { z:57, sym:"La", name:"Lanthanum", name_zh:"镧", mass:"138.91", cat:"lanthanide", state:"solid", year:1839, config:"[Xe] 5d¹ 6s²", group:3, period:6 },
-  { z:58, sym:"Ce", name:"Cerium", name_zh:"铈", mass:"140.12", cat:"lanthanide", state:"solid", year:1803, config:"[Xe] 4f¹ 5d¹ 6s²", group:null, period:9 },
-  { z:59, sym:"Pr", name:"Praseodymium", name_zh:"镨", mass:"140.91", cat:"lanthanide", state:"solid", year:1885, config:"[Xe] 4f³ 6s²", group:null, period:9 },
-  { z:60, sym:"Nd", name:"Neodymium", name_zh:"钕", mass:"144.24", cat:"lanthanide", state:"solid", year:1885, config:"[Xe] 4f⁴ 6s²", group:null, period:9 },
-  { z:61, sym:"Pm", name:"Promethium", name_zh:"钷", mass:"[145]", cat:"lanthanide", state:"solid", year:1945, config:"[Xe] 4f⁵ 6s²", group:null, period:9 },
-  { z:62, sym:"Sm", name:"Samarium", name_zh:"钐", mass:"150.36", cat:"lanthanide", state:"solid", year:1879, config:"[Xe] 4f⁶ 6s²", group:null, period:9 },
-  { z:63, sym:"Eu", name:"Europium", name_zh:"铕", mass:"151.96", cat:"lanthanide", state:"solid", year:1901, config:"[Xe] 4f⁷ 6s²", group:null, period:9 },
-  { z:64, sym:"Gd", name:"Gadolinium", name_zh:"钆", mass:"157.25", cat:"lanthanide", state:"solid", year:1880, config:"[Xe] 4f⁷ 5d¹ 6s²", group:null, period:9 },
-  { z:65, sym:"Tb", name:"Terbium", name_zh:"铽", mass:"158.93", cat:"lanthanide", state:"solid", year:1843, config:"[Xe] 4f⁹ 6s²", group:null, period:9 },
-  { z:66, sym:"Dy", name:"Dysprosium", name_zh:"镝", mass:"162.50", cat:"lanthanide", state:"solid", year:1886, config:"[Xe] 4f¹⁰ 6s²", group:null, period:9 },
-  { z:67, sym:"Ho", name:"Holmium", name_zh:"钬", mass:"164.93", cat:"lanthanide", state:"solid", year:1867, config:"[Xe] 4f¹¹ 6s²", group:null, period:9 },
-  { z:68, sym:"Er", name:"Erbium", name_zh:"铒", mass:"167.26", cat:"lanthanide", state:"solid", year:1843, config:"[Xe] 4f¹² 6s²", group:null, period:9 },
-  { z:69, sym:"Tm", name:"Thulium", name_zh:"铥", mass:"168.93", cat:"lanthanide", state:"solid", year:1879, config:"[Xe] 4f¹³ 6s²", group:null, period:9 },
-  { z:70, sym:"Yb", name:"Ytterbium", name_zh:"镱", mass:"173.05", cat:"lanthanide", state:"solid", year:1878, config:"[Xe] 4f¹⁴ 6s²", group:null, period:9 },
-  { z:71, sym:"Lu", name:"Lutetium", name_zh:"镥", mass:"174.97", cat:"lanthanide", state:"solid", year:1907, config:"[Xe] 4f¹⁴ 5d¹ 6s²", group:null, period:9 },
-  { z:72, sym:"Hf", name:"Hafnium", name_zh:"铪", mass:"178.49", cat:"transition", state:"solid", year:1923, config:"[Xe] 4f¹⁴ 5d² 6s²", group:4, period:6 },
-  { z:73, sym:"Ta", name:"Tantalum", name_zh:"钽", mass:"180.95", cat:"transition", state:"solid", year:1802, config:"[Xe] 4f¹⁴ 5d³ 6s²", group:5, period:6 },
-  { z:74, sym:"W", name:"Tungsten", name_zh:"钨", mass:"183.84", cat:"transition", state:"solid", year:1783, config:"[Xe] 4f¹⁴ 5d⁴ 6s²", group:6, period:6 },
-  { z:75, sym:"Re", name:"Rhenium", name_zh:"铼", mass:"186.21", cat:"transition", state:"solid", year:1925, config:"[Xe] 4f¹⁴ 5d⁵ 6s²", group:7, period:6 },
-  { z:76, sym:"Os", name:"Osmium", name_zh:"锇", mass:"190.23", cat:"transition", state:"solid", year:1803, config:"[Xe] 4f¹⁴ 5d⁶ 6s²", group:8, period:6 },
-  { z:77, sym:"Ir", name:"Iridium", name_zh:"铱", mass:"192.22", cat:"transition", state:"solid", year:1803, config:"[Xe] 4f¹⁴ 5d⁷ 6s²", group:9, period:6 },
-  { z:78, sym:"Pt", name:"Platinum", name_zh:"铂", mass:"195.08", cat:"transition", state:"solid", year:1735, config:"[Xe] 4f¹⁴ 5d⁹ 6s¹", group:10, period:6 },
-  { z:79, sym:"Au", name:"Gold", name_zh:"金", mass:"196.97", cat:"transition", state:"solid", year:null, config:"[Xe] 4f¹⁴ 5d¹⁰ 6s¹", group:11, period:6 },
-  { z:80, sym:"Hg", name:"Mercury", name_zh:"汞", mass:"200.59", cat:"transition", state:"liquid", year:null, config:"[Xe] 4f¹⁴ 5d¹⁰ 6s²", group:12, period:6 },
-  { z:81, sym:"Tl", name:"Thallium", name_zh:"铊", mass:"204.38", cat:"post-trans", state:"solid", year:1861, config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p¹", group:13, period:6 },
-  { z:82, sym:"Pb", name:"Lead", name_zh:"铅", mass:"207.2", cat:"post-trans", state:"solid", year:null, config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p²", group:14, period:6 },
-  { z:83, sym:"Bi", name:"Bismuth", name_zh:"铋", mass:"208.98", cat:"post-trans", state:"solid", year:null, config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p³", group:15, period:6 },
-  { z:84, sym:"Po", name:"Polonium", name_zh:"钋", mass:"[209]", cat:"metalloid", state:"solid", year:1898, config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁴", group:16, period:6 },
-  { z:85, sym:"At", name:"Astatine", name_zh:"砹", mass:"[210]", cat:"halogen", state:"solid", year:1940, config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁵", group:17, period:6 },
-  { z:86, sym:"Rn", name:"Radon", name_zh:"氡", mass:"[222]", cat:"noble-gas", state:"gas", year:1900, config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁶", group:18, period:6 },
-  { z:87, sym:"Fr", name:"Francium", name_zh:"钫", mass:"[223]", cat:"alkali", state:"solid", year:1939, config:"[Rn] 7s¹", group:1, period:7 },
-  { z:88, sym:"Ra", name:"Radium", name_zh:"镭", mass:"[226]", cat:"alkaline", state:"solid", year:1898, config:"[Rn] 7s²", group:2, period:7 },
-  { z:89, sym:"Ac", name:"Actinium", name_zh:"锕", mass:"[227]", cat:"actinide", state:"solid", year:1899, config:"[Rn] 6d¹ 7s²", group:3, period:7 },
-  { z:90, sym:"Th", name:"Thorium", name_zh:"钍", mass:"232.04", cat:"actinide", state:"solid", year:1829, config:"[Rn] 6d² 7s²", group:null, period:10 },
-  { z:91, sym:"Pa", name:"Protactinium", name_zh:"镤", mass:"231.04", cat:"actinide", state:"solid", year:1913, config:"[Rn] 5f² 6d¹ 7s²", group:null, period:10 },
-  { z:92, sym:"U", name:"Uranium", name_zh:"铀", mass:"238.03", cat:"actinide", state:"solid", year:1789, config:"[Rn] 5f³ 6d¹ 7s²", group:null, period:10 },
-  { z:93, sym:"Np", name:"Neptunium", name_zh:"镎", mass:"[237]", cat:"actinide", state:"solid", year:1940, config:"[Rn] 5f⁴ 6d¹ 7s²", group:null, period:10 },
-  { z:94, sym:"Pu", name:"Plutonium", name_zh:"钚", mass:"[244]", cat:"actinide", state:"solid", year:1940, config:"[Rn] 5f⁶ 7s²", group:null, period:10 },
-  { z:95, sym:"Am", name:"Americium", name_zh:"镅", mass:"[243]", cat:"actinide", state:"solid", year:1944, config:"[Rn] 5f⁷ 7s²", group:null, period:10 },
-  { z:96, sym:"Cm", name:"Curium", name_zh:"锔", mass:"[247]", cat:"actinide", state:"solid", year:1944, config:"[Rn] 5f⁷ 6d¹ 7s²", group:null, period:10 },
-  { z:97, sym:"Bk", name:"Berkelium", name_zh:"锫", mass:"[247]", cat:"actinide", state:"solid", year:1949, config:"[Rn] 5f⁹ 7s²", group:null, period:10 },
-  { z:98, sym:"Cf", name:"Californium", name_zh:"锎", mass:"[251]", cat:"actinide", state:"solid", year:1950, config:"[Rn] 5f¹⁰ 7s²", group:null, period:10 },
-  { z:99, sym:"Es", name:"Einsteinium", name_zh:"锿", mass:"[252]", cat:"actinide", state:"solid", year:1952, config:"[Rn] 5f¹¹ 7s²", group:null, period:10 },
-  { z:100, sym:"Fm", name:"Fermium", name_zh:"镄", mass:"[257]", cat:"actinide", state:"solid", year:1952, config:"[Rn] 5f¹² 7s²", group:null, period:10 },
-  { z:101, sym:"Md", name:"Mendelevium", name_zh:"钔", mass:"[258]", cat:"actinide", state:"solid", year:1955, config:"[Rn] 5f¹³ 7s²", group:null, period:10 },
-  { z:102, sym:"No", name:"Nobelium", name_zh:"锘", mass:"[259]", cat:"actinide", state:"solid", year:1958, config:"[Rn] 5f¹⁴ 7s²", group:null, period:10 },
-  { z:103, sym:"Lr", name:"Lawrencium", name_zh:"铹", mass:"[266]", cat:"actinide", state:"solid", year:1961, config:"[Rn] 5f¹⁴ 7s² 7p¹", group:null, period:10 },
-  { z:104, sym:"Rf", name:"Rutherfordium", name_zh:"𬬻", mass:"[267]", cat:"transition", state:"solid", year:1969, config:"[Rn] 5f¹⁴ 6d² 7s²", group:4, period:7 },
-  { z:105, sym:"Db", name:"Dubnium", name_zh:"𬭊", mass:"[268]", cat:"transition", state:"solid", year:1970, config:"[Rn] 5f¹⁴ 6d³ 7s²", group:5, period:7 },
-  { z:106, sym:"Sg", name:"Seaborgium", name_zh:"𬭳", mass:"[269]", cat:"transition", state:"solid", year:1974, config:"[Rn] 5f¹⁴ 6d⁴ 7s²", group:6, period:7 },
-  { z:107, sym:"Bh", name:"Bohrium", name_zh:"𬭛", mass:"[270]", cat:"transition", state:"solid", year:1981, config:"[Rn] 5f¹⁴ 6d⁵ 7s²", group:7, period:7 },
-  { z:108, sym:"Hs", name:"Hassium", name_zh:"𬭶", mass:"[269]", cat:"transition", state:"solid", year:1984, config:"[Rn] 5f¹⁴ 6d⁶ 7s²", group:8, period:7 },
-  { z:109, sym:"Mt", name:"Meitnerium", name_zh:"鿏", mass:"[278]", cat:"unknown", state:"unknown", year:1982, config:"[Rn] 5f¹⁴ 6d⁷ 7s²", group:9, period:7 },
-  { z:110, sym:"Ds", name:"Darmstadtium", name_zh:"𫟼", mass:"[281]", cat:"unknown", state:"unknown", year:1994, config:"[Rn] 5f¹⁴ 6d⁸ 7s²", group:10, period:7 },
-  { z:111, sym:"Rg", name:"Roentgenium", name_zh:"𬬭", mass:"[282]", cat:"unknown", state:"unknown", year:1994, config:"[Rn] 5f¹⁴ 6d¹⁰ 7s¹", group:11, period:7 },
-  { z:112, sym:"Cn", name:"Copernicium", name_zh:"鿔", mass:"[285]", cat:"transition", state:"gas", year:1996, config:"[Rn] 5f¹⁴ 6d¹⁰ 7s²", group:12, period:7 },
-  { z:113, sym:"Nh", name:"Nihonium", name_zh:"鉨", mass:"[286]", cat:"unknown", state:"unknown", year:2004, config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p¹", group:13, period:7 },
-  { z:114, sym:"Fl", name:"Flerovium", name_zh:"𫓧", mass:"[289]", cat:"unknown", state:"unknown", year:1999, config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p²", group:14, period:7 },
-  { z:115, sym:"Mc", name:"Moscovium", name_zh:"镆", mass:"[290]", cat:"unknown", state:"unknown", year:2003, config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p³", group:15, period:7 },
-  { z:116, sym:"Lv", name:"Livermorium", name_zh:"𫟷", mass:"[293]", cat:"unknown", state:"unknown", year:2000, config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁴", group:16, period:7 },
-  { z:117, sym:"Ts", name:"Tennessine", name_zh:"鿬", mass:"[294]", cat:"halogen", state:"unknown", year:2010, config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁵", group:17, period:7 },
-  { z:118, sym:"Og", name:"Oganesson", name_zh:"鿫", mass:"[294]", cat:"noble-gas", state:"unknown", year:2002, config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶", group:18, period:7 },
+    { z:1, sym:"H", name:"Hydrogen", mass:1.008, cat:"nonmetal", year:1766, config:"1s1", shells:[1] },
+    { z:2, sym:"He", name:"Helium", mass:4.003, cat:"noble-gas", year:1868, config:"1s2", shells:[2] },
+    { z:3, sym:"Li", name:"Lithium", mass:6.941, cat:"alkali-metal", year:1817, config:"[He]2s1", shells:[2,1] },
+    { z:4, sym:"Be", name:"Beryllium", mass:9.012, cat:"alkaline-earth-metal", year:1798, config:"[He]2s2", shells:[2,2] },
+    { z:5, sym:"B", name:"Boron", mass:10.81, cat:"metalloid", year:1808, config:"[He]2s2 2p1", shells:[2,3] },
+    { z:6, sym:"C", name:"Carbon", mass:12.01, cat:"nonmetal", year:0, config:"[He]2s2 2p2", shells:[2,4] },
+    { z:7, sym:"N", name:"Nitrogen", mass:14.01, cat:"nonmetal", year:1772, config:"[He]2s2 2p3", shells:[2,5] },
+    { z:8, sym:"O", name:"Oxygen", mass:16.00, cat:"nonmetal", year:1774, config:"[He]2s2 2p4", shells:[2,6] },
+    { z:9, sym:"F", name:"Fluorine", mass:19.00, cat:"halogen", year:1886, config:"[He]2s2 2p5", shells:[2,7] },
+    { z:10, sym:"Ne", name:"Neon", mass:20.18, cat:"noble-gas", year:1898, config:"[He]2s2 2p6", shells:[2,8] },
+    { z:11, sym:"Na", name:"Sodium", mass:22.99, cat:"alkali-metal", year:1807, config:"[Ne]3s1", shells:[2,8,1] },
+    { z:12, sym:"Mg", name:"Magnesium", mass:24.31, cat:"alkaline-earth-metal", year:1755, config:"[Ne]3s2", shells:[2,8,2] },
+    { z:13, sym:"Al", name:"Aluminium", mass:26.98, cat:"post-transition-metal", year:1825, config:"[Ne]3s2 3p1", shells:[2,8,3] },
+    { z:14, sym:"Si", name:"Silicon", mass:28.09, cat:"metalloid", year:1824, config:"[Ne]3s2 3p2", shells:[2,8,4] },
+    { z:15, sym:"P", name:"Phosphorus", mass:30.97, cat:"nonmetal", year:1669, config:"[Ne]3s2 3p3", shells:[2,8,5] },
+    { z:16, sym:"S", name:"Sulfur", mass:32.07, cat:"nonmetal", year:0, config:"[Ne]3s2 3p4", shells:[2,8,6] },
+    { z:17, sym:"Cl", name:"Chlorine", mass:35.45, cat:"halogen", year:1774, config:"[Ne]3s2 3p5", shells:[2,8,7] },
+    { z:18, sym:"Ar", name:"Argon", mass:39.95, cat:"noble-gas", year:1894, config:"[Ne]3s2 3p6", shells:[2,8,8] },
+    { z:19, sym:"K", name:"Potassium", mass:39.10, cat:"alkali-metal", year:1807, config:"[Ar]4s1", shells:[2,8,8,1] },
+    { z:20, sym:"Ca", name:"Calcium", mass:40.08, cat:"alkaline-earth-metal", year:1808, config:"[Ar]4s2", shells:[2,8,8,2] },
+    { z:21, sym:"Sc", name:"Scandium", mass:44.96, cat:"transition-metal", year:1879, config:"[Ar]3d1 4s2", shells:[2,8,9,2] },
+    { z:22, sym:"Ti", name:"Titanium", mass:47.87, cat:"transition-metal", year:1791, config:"[Ar]3d2 4s2", shells:[2,8,10,2] },
+    { z:23, sym:"V", name:"Vanadium", mass:50.94, cat:"transition-metal", year:1801, config:"[Ar]3d3 4s2", shells:[2,8,11,2] },
+    { z:24, sym:"Cr", name:"Chromium", mass:52.00, cat:"transition-metal", year:1797, config:"[Ar]3d5 4s1", shells:[2,8,13,1] },
+    { z:25, sym:"Mn", name:"Manganese", mass:54.94, cat:"transition-metal", year:1774, config:"[Ar]3d5 4s2", shells:[2,8,13,2] },
+    { z:26, sym:"Fe", name:"Iron", mass:55.85, cat:"transition-metal", year:0, config:"[Ar]3d6 4s2", shells:[2,8,14,2] },
+    { z:27, sym:"Co", name:"Cobalt", mass:58.93, cat:"transition-metal", year:1735, config:"[Ar]3d7 4s2", shells:[2,8,15,2] },
+    { z:28, sym:"Ni", name:"Nickel", mass:58.69, cat:"transition-metal", year:1751, config:"[Ar]3d8 4s2", shells:[2,8,16,2] },
+    { z:29, sym:"Cu", name:"Copper", mass:63.55, cat:"transition-metal", year:0, config:"[Ar]3d10 4s1", shells:[2,8,18,1] },
+    { z:30, sym:"Zn", name:"Zinc", mass:65.38, cat:"transition-metal", year:0, config:"[Ar]3d10 4s2", shells:[2,8,18,2] },
+    { z:31, sym:"Ga", name:"Gallium", mass:69.72, cat:"post-transition-metal", year:1875, config:"[Ar]3d10 4s2 4p1", shells:[2,8,18,3] },
+    { z:32, sym:"Ge", name:"Germanium", mass:72.63, cat:"metalloid", year:1886, config:"[Ar]3d10 4s2 4p2", shells:[2,8,18,4] },
+    { z:33, sym:"As", name:"Arsenic", mass:74.92, cat:"metalloid", year:0, config:"[Ar]3d10 4s2 4p3", shells:[2,8,18,5] },
+    { z:34, sym:"Se", name:"Selenium", mass:78.97, cat:"nonmetal", year:1817, config:"[Ar]3d10 4s2 4p4", shells:[2,8,18,6] },
+    { z:35, sym:"Br", name:"Bromine", mass:79.90, cat:"halogen", year:1826, config:"[Ar]3d10 4s2 4p5", shells:[2,8,18,7] },
+    { z:36, sym:"Kr", name:"Krypton", mass:83.80, cat:"noble-gas", year:1898, config:"[Ar]3d10 4s2 4p6", shells:[2,8,18,8] },
+    { z:37, sym:"Rb", name:"Rubidium", mass:85.47, cat:"alkali-metal", year:1861, config:"[Kr]5s1", shells:[2,8,18,8,1] },
+    { z:38, sym:"Sr", name:"Strontium", mass:87.62, cat:"alkaline-earth-metal", year:1790, config:"[Kr]5s2", shells:[2,8,18,8,2] },
+    { z:39, sym:"Y", name:"Yttrium", mass:88.91, cat:"transition-metal", year:1794, config:"[Kr]4d1 5s2", shells:[2,8,18,9,2] },
+    { z:40, sym:"Zr", name:"Zirconium", mass:91.22, cat:"transition-metal", year:1789, config:"[Kr]4d2 5s2", shells:[2,8,18,10,2] },
+    { z:41, sym:"Nb", name:"Niobium", mass:92.91, cat:"transition-metal", year:1801, config:"[Kr]4d4 5s1", shells:[2,8,18,12,1] },
+    { z:42, sym:"Mo", name:"Molybdenum", mass:95.95, cat:"transition-metal", year:1781, config:"[Kr]4d5 5s1", shells:[2,8,18,13,1] },
+    { z:43, sym:"Tc", name:"Technetium", mass:98, cat:"transition-metal", year:1937, config:"[Kr]4d5 5s2", shells:[2,8,18,13,2] },
+    { z:44, sym:"Ru", name:"Ruthenium", mass:101.07, cat:"transition-metal", year:1844, config:"[Kr]4d7 5s1", shells:[2,8,18,15,1] },
+    { z:45, sym:"Rh", name:"Rhodium", mass:102.91, cat:"transition-metal", year:1803, config:"[Kr]4d8 5s1", shells:[2,8,18,16,1] },
+    { z:46, sym:"Pd", name:"Palladium", mass:106.42, cat:"transition-metal", year:1803, config:"[Kr]4d10", shells:[2,8,18,18] },
+    { z:47, sym:"Ag", name:"Silver", mass:107.87, cat:"transition-metal", year:0, config:"[Kr]4d10 5s1", shells:[2,8,18,18,1] },
+    { z:48, sym:"Cd", name:"Cadmium", mass:112.41, cat:"transition-metal", year:1817, config:"[Kr]4d10 5s2", shells:[2,8,18,18,2] },
+    { z:49, sym:"In", name:"Indium", mass:114.82, cat:"post-transition-metal", year:1863, config:"[Kr]4d10 5s2 5p1", shells:[2,8,18,18,3] },
+    { z:50, sym:"Sn", name:"Tin", mass:118.71, cat:"post-transition-metal", year:0, config:"[Kr]4d10 5s2 5p2", shells:[2,8,18,18,4] },
+    { z:51, sym:"Sb", name:"Antimony", mass:121.76, cat:"metalloid", year:0, config:"[Kr]4d10 5s2 5p3", shells:[2,8,18,18,5] },
+    { z:52, sym:"Te", name:"Tellurium", mass:127.60, cat:"metalloid", year:1783, config:"[Kr]4d10 5s2 5p4", shells:[2,8,18,18,6] },
+    { z:53, sym:"I", name:"Iodine", mass:126.90, cat:"halogen", year:1811, config:"[Kr]4d10 5s2 5p5", shells:[2,8,18,18,7] },
+    { z:54, sym:"Xe", name:"Xenon", mass:131.29, cat:"noble-gas", year:1898, config:"[Kr]4d10 5s2 5p6", shells:[2,8,18,18,8] },
+    { z:55, sym:"Cs", name:"Cesium", mass:132.91, cat:"alkali-metal", year:1860, config:"[Xe]6s1", shells:[2,8,18,18,8,1] },
+    { z:56, sym:"Ba", name:"Barium", mass:137.33, cat:"alkaline-earth-metal", year:1808, config:"[Xe]6s2", shells:[2,8,18,18,8,2] },
+    { z:57, sym:"La", name:"Lanthanum", mass:138.91, cat:"lanthanide", year:1839, config:"[Xe]5d1 6s2", shells:[2,8,18,18,9,2] },
+    { z:58, sym:"Ce", name:"Cerium", mass:140.12, cat:"lanthanide", year:1803, config:"[Xe]4f1 5d1 6s2", shells:[2,8,18,19,9,2] },
+    { z:59, sym:"Pr", name:"Praseodymium", mass:140.91, cat:"lanthanide", year:1885, config:"[Xe]4f3 6s2", shells:[2,8,18,21,8,2] },
+    { z:60, sym:"Nd", name:"Neodymium", mass:144.24, cat:"lanthanide", year:1885, config:"[Xe]4f4 6s2", shells:[2,8,18,22,8,2] },
+    { z:61, sym:"Pm", name:"Promethium", mass:145, cat:"lanthanide", year:1945, config:"[Xe]4f5 6s2", shells:[2,8,18,23,8,2] },
+    { z:62, sym:"Sm", name:"Samarium", mass:150.36, cat:"lanthanide", year:1879, config:"[Xe]4f6 6s2", shells:[2,8,18,24,8,2] },
+    { z:63, sym:"Eu", name:"Europium", mass:151.96, cat:"lanthanide", year:1901, config:"[Xe]4f7 6s2", shells:[2,8,18,25,8,2] },
+    { z:64, sym:"Gd", name:"Gadolinium", mass:157.25, cat:"lanthanide", year:1880, config:"[Xe]4f7 5d1 6s2", shells:[2,8,18,25,9,2] },
+    { z:65, sym:"Tb", name:"Terbium", mass:158.93, cat:"lanthanide", year:1843, config:"[Xe]4f9 6s2", shells:[2,8,18,27,8,2] },
+    { z:66, sym:"Dy", name:"Dysprosium", mass:162.50, cat:"lanthanide", year:1886, config:"[Xe]4f10 6s2", shells:[2,8,18,28,8,2] },
+    { z:67, sym:"Ho", name:"Holmium", mass:164.93, cat:"lanthanide", year:1878, config:"[Xe]4f11 6s2", shells:[2,8,18,29,8,2] },
+    { z:68, sym:"Er", name:"Erbium", mass:167.26, cat:"lanthanide", year:1843, config:"[Xe]4f12 6s2", shells:[2,8,18,30,8,2] },
+    { z:69, sym:"Tm", name:"Thulium", mass:168.93, cat:"lanthanide", year:1879, config:"[Xe]4f13 6s2", shells:[2,8,18,31,8,2] },
+    { z:70, sym:"Yb", name:"Ytterbium", mass:173.05, cat:"lanthanide", year:1878, config:"[Xe]4f14 6s2", shells:[2,8,18,32,8,2] },
+    { z:71, sym:"Lu", name:"Lutetium", mass:174.97, cat:"lanthanide", year:1907, config:"[Xe]4f14 5d1 6s2", shells:[2,8,18,32,9,2] },
+    { z:72, sym:"Hf", name:"Hafnium", mass:178.49, cat:"transition-metal", year:1923, config:"[Xe]4f14 5d2 6s2", shells:[2,8,18,32,10,2] },
+    { z:73, sym:"Ta", name:"Tantalum", mass:180.95, cat:"transition-metal", year:1802, config:"[Xe]4f14 5d3 6s2", shells:[2,8,18,32,11,2] },
+    { z:74, sym:"W", name:"Tungsten", mass:183.84, cat:"transition-metal", year:1783, config:"[Xe]4f14 5d4 6s2", shells:[2,8,18,32,12,2] },
+    { z:75, sym:"Re", name:"Rhenium", mass:186.21, cat:"transition-metal", year:1925, config:"[Xe]4f14 5d5 6s2", shells:[2,8,18,32,13,2] },
+    { z:76, sym:"Os", name:"Osmium", mass:190.23, cat:"transition-metal", year:1803, config:"[Xe]4f14 5d6 6s2", shells:[2,8,18,32,14,2] },
+    { z:77, sym:"Ir", name:"Iridium", mass:192.22, cat:"transition-metal", year:1803, config:"[Xe]4f14 5d7 6s2", shells:[2,8,18,32,15,2] },
+    { z:78, sym:"Pt", name:"Platinum", mass:195.08, cat:"transition-metal", year:1735, config:"[Xe]4f14 5d9 6s1", shells:[2,8,18,32,17,1] },
+    { z:79, sym:"Au", name:"Gold", mass:196.97, cat:"transition-metal", year:0, config:"[Xe]4f14 5d10 6s1", shells:[2,8,18,32,18,1] },
+    { z:80, sym:"Hg", name:"Mercury", mass:200.59, cat:"transition-metal", year:0, config:"[Xe]4f14 5d10 6s2", shells:[2,8,18,32,18,2] },
+    { z:81, sym:"Tl", name:"Thallium", mass:204.38, cat:"post-transition-metal", year:1861, config:"[Xe]4f14 5d10 6s2 6p1", shells:[2,8,18,32,18,3] },
+    { z:82, sym:"Pb", name:"Lead", mass:207.2, cat:"post-transition-metal", year:0, config:"[Xe]4f14 5d10 6s2 6p2", shells:[2,8,18,32,18,4] },
+    { z:83, sym:"Bi", name:"Bismuth", mass:208.98, cat:"post-transition-metal", year:1753, config:"[Xe]4f14 5d10 6s2 6p3", shells:[2,8,18,32,18,5] },
+    { z:84, sym:"Po", name:"Polonium", mass:209, cat:"post-transition-metal", year:1898, config:"[Xe]4f14 5d10 6s2 6p4", shells:[2,8,18,32,18,6] },
+    { z:85, sym:"At", name:"Astatine", mass:210, cat:"halogen", year:1940, config:"[Xe]4f14 5d10 6s2 6p5", shells:[2,8,18,32,18,7] },
+    { z:86, sym:"Rn", name:"Radon", mass:222, cat:"noble-gas", year:1900, config:"[Xe]4f14 5d10 6s2 6p6", shells:[2,8,18,32,18,8] },
+    { z:87, sym:"Fr", name:"Francium", mass:223, cat:"alkali-metal", year:1939, config:"[Rn]7s1", shells:[2,8,18,32,18,8,1] },
+    { z:88, sym:"Ra", name:"Radium", mass:226, cat:"alkaline-earth-metal", year:1898, config:"[Rn]7s2", shells:[2,8,18,32,18,8,2] },
+    { z:89, sym:"Ac", name:"Actinium", mass:227, cat:"actinide", year:1899, config:"[Rn]6d1 7s2", shells:[2,8,18,32,18,9,2] },
+    { z:90, sym:"Th", name:"Thorium", mass:232.04, cat:"actinide", year:1829, config:"[Rn]6d2 7s2", shells:[2,8,18,32,18,10,2] },
+    { z:91, sym:"Pa", name:"Protactinium", mass:231.04, cat:"actinide", year:1913, config:"[Rn]5f2 6d1 7s2", shells:[2,8,18,32,20,9,2] },
+    { z:92, sym:"U", name:"Uranium", mass:238.03, cat:"actinide", year:1789, config:"[Rn]5f3 6d1 7s2", shells:[2,8,18,32,21,9,2] },
+    { z:93, sym:"Np", name:"Neptunium", mass:237, cat:"actinide", year:1940, config:"[Rn]5f4 6d1 7s2", shells:[2,8,18,32,22,9,2] },
+    { z:94, sym:"Pu", name:"Plutonium", mass:244, cat:"actinide", year:1940, config:"[Rn]5f6 7s2", shells:[2,8,18,32,24,8,2] },
+    { z:95, sym:"Am", name:"Americium", mass:243, cat:"actinide", year:1944, config:"[Rn]5f7 7s2", shells:[2,8,18,32,25,8,2] },
+    { z:96, sym:"Cm", name:"Curium", mass:247, cat:"actinide", year:1944, config:"[Rn]5f7 6d1 7s2", shells:[2,8,18,32,25,9,2] },
+    { z:97, sym:"Bk", name:"Berkelium", mass:247, cat:"actinide", year:1949, config:"[Rn]5f9 7s2", shells:[2,8,18,32,27,8,2] },
+    { z:98, sym:"Cf", name:"Californium", mass:251, cat:"actinide", year:1950, config:"[Rn]5f10 7s2", shells:[2,8,18,32,28,8,2] },
+    { z:99, sym:"Es", name:"Einsteinium", mass:252, cat:"actinide", year:1952, config:"[Rn]5f11 7s2", shells:[2,8,18,32,29,8,2] },
+    { z:100, sym:"Fm", name:"Fermium", mass:257, cat:"actinide", year:1952, config:"[Rn]5f12 7s2", shells:[2,8,18,32,30,8,2] },
+    { z:101, sym:"Md", name:"Mendelevium", mass:258, cat:"actinide", year:1955, config:"[Rn]5f13 7s2", shells:[2,8,18,32,31,8,2] },
+    { z:102, sym:"No", name:"Nobelium", mass:259, cat:"actinide", year:1958, config:"[Rn]5f14 7s2", shells:[2,8,18,32,32,8,2] },
+    { z:103, sym:"Lr", name:"Lawrencium", mass:266, cat:"actinide", year:1961, config:"[Rn]5f14 7s2 7p1", shells:[2,8,18,32,32,8,3] },
+    { z:104, sym:"Rf", name:"Rutherfordium", mass:267, cat:"transition-metal", year:1969, config:"[Rn]5f14 6d2 7s2", shells:[2,8,18,32,32,10,2] },
+    { z:105, sym:"Db", name:"Dubnium", mass:268, cat:"transition-metal", year:1970, config:"[Rn]5f14 6d3 7s2", shells:[2,8,18,32,32,11,2] },
+    { z:106, sym:"Sg", name:"Seaborgium", mass:269, cat:"transition-metal", year:1974, config:"[Rn]5f14 6d4 7s2", shells:[2,8,18,32,32,12,2] },
+    { z:107, sym:"Bh", name:"Bohrium", mass:270, cat:"transition-metal", year:1981, config:"[Rn]5f14 6d5 7s2", shells:[2,8,18,32,32,13,2] },
+    { z:108, sym:"Hs", name:"Hassium", mass:277, cat:"transition-metal", year:1984, config:"[Rn]5f14 6d6 7s2", shells:[2,8,18,32,32,14,2] },
+    { z:109, sym:"Mt", name:"Meitnerium", mass:278, cat:"transition-metal", year:1982, config:"[Rn]5f14 6d7 7s2", shells:[2,8,18,32,32,15,2] },
+    { z:110, sym:"Ds", name:"Darmstadtium", mass:281, cat:"transition-metal", year:1994, config:"[Rn]5f14 6d8 7s2", shells:[2,8,18,32,32,16,2] },
+    { z:111, sym:"Rg", name:"Roentgenium", mass:282, cat:"transition-metal", year:1994, config:"[Rn]5f14 6d9 7s2", shells:[2,8,18,32,32,17,2] },
+    { z:112, sym:"Cn", name:"Copernicium", mass:285, cat:"transition-metal", year:1996, config:"[Rn]5f14 6d10 7s2", shells:[2,8,18,32,32,18,2] },
+    { z:113, sym:"Nh", name:"Nihonium", mass:286, cat:"post-transition-metal", year:2003, config:"[Rn]5f14 6d10 7s2 7p1", shells:[2,8,18,32,32,18,3] },
+    { z:114, sym:"Fl", name:"Flerovium", mass:289, cat:"post-transition-metal", year:1999, config:"[Rn]5f14 6d10 7s2 7p2", shells:[2,8,18,32,32,18,4] },
+    { z:115, sym:"Mc", name:"Moscovium", mass:290, cat:"post-transition-metal", year:2003, config:"[Rn]5f14 6d10 7s2 7p3", shells:[2,8,18,32,32,18,5] },
+    { z:116, sym:"Lv", name:"Livermorium", mass:293, cat:"post-transition-metal", year:2000, config:"[Rn]5f14 6d10 7s2 7p4", shells:[2,8,18,32,32,18,6] },
+    { z:117, sym:"Ts", name:"Tennessine", mass:294, cat:"halogen", year:2010, config:"[Rn]5f14 6d10 7s2 7p5", shells:[2,8,18,32,32,18,7] },
+    { z:118, sym:"Og", name:"Oganesson", mass:294, cat:"noble-gas", year:2006, config:"[Rn]5f14 6d10 7s2 7p6", shells:[2,8,18,32,32,18,8] }
 ];
 
-/* ═══════════════════════════════════════════════════════════════════════
-   I18N Dictionary
-═══════════════════════════════════════════════════════════════════════ */
-const I18N = {
-  en: {
-    title: "Periodic Table",
-    subtitle: "118 Elements · Liquid Glass Interface",
-    search_placeholder: "Search element or symbol…",
-    modal_3d_label: "Atomic Model",
-    drag_hint: "↻ Drag to rotate",
-    theme_toggle_title: "Toggle Theme",
-    lang_toggle_title: "Switch Language",
-
-    cat_alkali: "Alkali Metals",
-    cat_alkaline: "Alkaline Earth Metals",
-    cat_lanthanide: "Lanthanides",
-    cat_actinide: "Actinides",
-    cat_transition: "Transition Metals",
-    cat_post_trans: "Post-transition Metals",
-    cat_metalloid: "Metalloids",
-    cat_nonmetal: "Nonmetals",
-    cat_halogen: "Halogens",
-    cat_noble_gas: "Noble Gases",
-    cat_unknown: "Unknown Properties",
-
-    detail_atomic_mass: "Atomic Mass",
-    detail_year_discovered: "Year Discovered",
-    detail_electron_config: "Electron Configuration",
-    detail_state: "State (Room Temp)",
-    detail_group_period: "Group / Period",
-
-    state_solid: "Solid",
-    state_liquid: "Liquid",
-    state_gas: "Gas",
-    state_unknown: "Unknown",
-
-    ancient_unknown: "Ancient / Unknown",
-    f_block: "f-block",
-    group_label: "Group",
-    period_label: "Period",
-  },
-  zh: {
-    title: "元素周期表",
-    subtitle: "118种元素 · 液态玻璃界面",
-    search_placeholder: "搜索元素或符号…",
-    modal_3d_label: "原子模型",
-    drag_hint: "↻ 拖拽旋转",
-    theme_toggle_title: "切换主题",
-    lang_toggle_title: "切换语言",
-
-    cat_alkali: "碱金属",
-    cat_alkaline: "碱土金属",
-    cat_lanthanide: "镧系元素",
-    cat_actinide: "锕系元素",
-    cat_transition: "过渡金属",
-    cat_post_trans: "后过渡金属",
-    cat_metalloid: "准金属",
-    cat_nonmetal: "非金属",
-    cat_halogen: "卤素",
-    cat_noble_gas: "稀有气体",
-    cat_unknown: "未知属性",
-
-    detail_atomic_mass: "原子质量",
-    detail_year_discovered: "发现年份",
-    detail_electron_config: "电子排布",
-    detail_state: "状态 (室温)",
-    detail_group_period: "族 / 周期",
-
-    state_solid: "固体",
-    state_liquid: "液体",
-    state_gas: "气体",
-    state_unknown: "未知",
-
-    ancient_unknown: "古代 / 未知",
-    f_block: "f区",
-    group_label: "族",
-    period_label: "周期",
-  },
+/* ============================================================
+   GRID POSITIONS FOR ALL 118 ELEMENTS
+   row/col are 1-indexed CSS grid lines
+   ============================================================ */
+// Row 1 = group labels, Rows 2-8 = periods 1-7, Row 9 = spacer, Rows 10-11 = lanthanides/actinides
+// Col 1 = period labels, Cols 2-19 = groups 1-18
+const GRID = {
+    /* Period 1 */ 1:[2,2], 2:[2,19],
+    /* Period 2 */ 3:[3,2], 4:[3,3], 5:[3,14], 6:[3,15], 7:[3,16], 8:[3,17], 9:[3,18], 10:[3,19],
+    /* Period 3 */ 11:[4,2], 12:[4,3], 13:[4,14], 14:[4,15], 15:[4,16], 16:[4,17], 17:[4,18], 18:[4,19],
+    /* Period 4 */ 19:[5,2], 20:[5,3], 21:[5,4], 22:[5,5], 23:[5,6], 24:[5,7], 25:[5,8], 26:[5,9],
+                   27:[5,10], 28:[5,11], 29:[5,12], 30:[5,13], 31:[5,14], 32:[5,15], 33:[5,16], 34:[5,17], 35:[5,18], 36:[5,19],
+    /* Period 5 */ 37:[6,2], 38:[6,3], 39:[6,4], 40:[6,5], 41:[6,6], 42:[6,7], 43:[6,8], 44:[6,9],
+                   45:[6,10], 46:[6,11], 47:[6,12], 48:[6,13], 49:[6,14], 50:[6,15], 51:[6,16], 52:[6,17], 53:[6,18], 54:[6,19],
+    /* Period 6 */ 55:[7,2], 56:[7,3], 72:[7,5], 73:[7,6], 74:[7,7], 75:[7,8], 76:[7,9],
+                   77:[7,10], 78:[7,11], 79:[7,12], 80:[7,13], 81:[7,14], 82:[7,15], 83:[7,16], 84:[7,17], 85:[7,18], 86:[7,19],
+    /* Period 7 */ 87:[8,2], 88:[8,3], 104:[8,5], 105:[8,6], 106:[8,7], 107:[8,8], 108:[8,9],
+                   109:[8,10], 110:[8,11], 111:[8,12], 112:[8,13], 113:[8,14], 114:[8,15], 115:[8,16], 116:[8,17], 117:[8,18], 118:[8,19],
+    /* Lanthanides (row 10) */ 57:[10,4], 58:[10,5], 59:[10,6], 60:[10,7], 61:[10,8], 62:[10,9], 63:[10,10],
+                              64:[10,11], 65:[10,12], 66:[10,13], 67:[10,14], 68:[10,15], 69:[10,16], 70:[10,17], 71:[10,18],
+    /* Actinides (row 11) */  89:[11,4], 90:[11,5], 91:[11,6], 92:[11,7], 93:[11,8], 94:[11,9], 95:[11,10],
+                              96:[11,11], 97:[11,12], 98:[11,13], 99:[11,14], 100:[11,15], 101:[11,16], 102:[11,17], 103:[11,18]
 };
 
-/* ═══════════════════════════════════════════════════════════════════════
-   State — Theme & Language
-═══════════════════════════════════════════════════════════════════════ */
-let currentLang = localStorage.getItem('element-lang') || 'en';
-let currentTheme = localStorage.getItem('element-theme') || 'dark';
+// La and Ac also appear in main table rows
+const EXTRA_GRID = { 57: [7,4], 89: [8,4] };
 
-function t(key) {
-  return (I18N[currentLang] && I18N[currentLang][key]) || (I18N.en[key]) || key;
-}
-
-function getElName(el) {
-  return currentLang === 'zh' ? el.name_zh : el.name;
-}
-
-function getCatLabel(cat) {
-  const keyMap = {
-    "alkali": "cat_alkali",
-    "alkaline": "cat_alkaline",
-    "lanthanide": "cat_lanthanide",
-    "actinide": "cat_actinide",
-    "transition": "cat_transition",
-    "post-trans": "cat_post_trans",
-    "metalloid": "cat_metalloid",
-    "nonmetal": "cat_nonmetal",
-    "halogen": "cat_halogen",
-    "noble-gas": "cat_noble_gas",
-    "unknown": "cat_unknown",
-  };
-  return t(keyMap[cat] || cat);
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
-   Theme Toggle
-═══════════════════════════════════════════════════════════════════════ */
-function applyTheme() {
-  document.documentElement.setAttribute('data-theme', currentTheme);
-  const themeIcon = document.getElementById('themeIcon');
-  if (themeIcon) {
-    themeIcon.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
-  }
-  refreshParticleColors();
-}
-
-document.getElementById('themeToggle').addEventListener('click', () => {
-  currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
-  localStorage.setItem('element-theme', currentTheme);
-  applyTheme();
-});
-
-/* ═══════════════════════════════════════════════════════════════════════
-   Language Toggle & UI Update
-═══════════════════════════════════════════════════════════════════════ */
-function applyLanguage() {
-  document.documentElement.lang = currentLang;
-
-  const langLabel = document.getElementById('langLabel');
-  if (langLabel) {
-    langLabel.textContent = currentLang === 'zh' ? 'EN' : '中';
-  }
-
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.dataset.i18n;
-    el.textContent = t(key);
-  });
-
-  document.querySelectorAll('[data-i18n-title]').forEach(el => {
-    const key = el.dataset.i18nTitle;
-    el.title = t(key);
-  });
-
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-    const key = el.dataset.i18nPlaceholder;
-    el.placeholder = t(key);
-  });
-
-  const tiles = document.querySelectorAll('.element');
-  tiles.forEach(t => {
-    const z = parseInt(t.dataset.z);
-    const el = ELEMENTS[z - 1];
-    const nameSpan = t.querySelector('.el-name');
-    if (nameSpan) {
-      nameSpan.textContent = currentLang === 'zh' ? el.name_zh : el.name;
-    }
-  });
-
-  const legendItems = document.querySelectorAll('.legend-item');
-  legendItems.forEach(item => {
-    const cat = item.dataset.cat;
-    const label = getCatLabel(cat);
-    const dot = item.querySelector('.legend-dot');
-    if (dot) {
-      item.innerHTML = '';
-      item.appendChild(dot);
-      item.appendChild(document.createTextNode(' ' + label));
-    }
-  });
-
-  const modalDetail = document.getElementById('modalDetail');
-  if (modalDetail && modalDetail.dataset.z) {
-    const el = ELEMENTS[parseInt(modalDetail.dataset.z) - 1];
-    if (el) renderModalDetail(el);
-  }
-}
-
-document.getElementById('langToggle').addEventListener('click', () => {
-  currentLang = currentLang === 'en' ? 'zh' : 'en';
-  localStorage.setItem('element-lang', currentLang);
-  applyLanguage();
-});
-
-/* ═══════════════════════════════════════════════════════════════════════
-   Category Meta
-═══════════════════════════════════════════════════════════════════════ */
-const CAT_META = {
-  "alkali": { color:"var(--c-alkali)" },
-  "alkaline": { color:"var(--c-alkaline)" },
-  "lanthanide": { color:"var(--c-lanthanide)" },
-  "actinide": { color:"var(--c-actinide)" },
-  "transition": { color:"var(--c-transition)" },
-  "post-trans": { color:"var(--c-post-trans)" },
-  "metalloid": { color:"var(--c-metalloid)" },
-  "nonmetal": { color:"var(--c-nonmetal)" },
-  "halogen": { color:"var(--c-halogen)" },
-  "noble-gas": { color:"var(--c-noble)" },
-  "unknown": { color:"var(--c-unknown)" },
+/* ============================================================
+   CATEGORY METADATA
+   ============================================================ */
+const CATEGORIES = {
+    "alkali-metal":         { color:"rgba(255,183,77,0.22)",  colorDark:"rgba(255,183,77,0.10)" },
+    "alkaline-earth-metal": { color:"rgba(255,224,130,0.22)", colorDark:"rgba(255,224,130,0.10)" },
+    "transition-metal":     { color:"rgba(255,171,145,0.20)", colorDark:"rgba(255,171,145,0.09)" },
+    "post-transition-metal":{ color:"rgba(159,213,203,0.20)", colorDark:"rgba(159,213,203,0.09)" },
+    "metalloid":            { color:"rgba(128,203,196,0.20)", colorDark:"rgba(128,203,196,0.09)" },
+    "nonmetal":             { color:"rgba(165,214,167,0.20)", colorDark:"rgba(165,214,167,0.09)" },
+    "halogen":              { color:"rgba(179,157,219,0.22)", colorDark:"rgba(179,157,219,0.09)" },
+    "noble-gas":            { color:"rgba(206,147,216,0.22)", colorDark:"rgba(206,147,216,0.09)" },
+    "lanthanide":           { color:"rgba(240,98,146,0.18)",  colorDark:"rgba(240,98,146,0.08)" },
+    "actinide":             { color:"rgba(229,115,115,0.18)", colorDark:"rgba(229,115,115,0.08)" }
 };
 
-/* ═══════════════════════════════════════════════════════════════════════
-   Build Legend
-═══════════════════════════════════════════════════════════════════════ */
-let activeFilter = null;
-const legendEl = document.getElementById('legend');
-Object.entries(CAT_META).forEach(([cat, meta]) => {
-  const item = document.createElement('div');
-  item.className = 'legend-item';
-  item.dataset.cat = cat;
-  const label = getCatLabel(cat);
-  item.innerHTML = `<span class="legend-dot" style="background:${meta.color}"></span> ${label}`;
-  item.addEventListener('click', () => toggleFilter(cat, item));
-  legendEl.appendChild(item);
-});
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+let isDark = root.getAttribute('data-theme') === 'dark';
 
-function toggleFilter(cat, itemEl) {
-  const allTiles = document.querySelectorAll('.element');
-  const allLegend = document.querySelectorAll('.legend-item');
-  if (activeFilter === cat) {
-    activeFilter = null;
-    allTiles.forEach(t => t.classList.remove('dimmed','highlighted'));
-    allLegend.forEach(l => l.classList.remove('active'));
-  } else {
-    activeFilter = cat;
-    allLegend.forEach(l => l.classList.remove('active'));
-    itemEl.classList.add('active');
-    allTiles.forEach(t => {
-      if (t.dataset.cat === cat) {
-        t.classList.remove('dimmed'); t.classList.add('highlighted');
-      } else {
-        t.classList.add('dimmed'); t.classList.remove('highlighted');
-      }
-    });
-  }
+function formatMass(mass, precision) {
+    return (typeof mass === 'number' && mass % 1 !== 0 ? mass.toFixed(precision) : mass);
 }
 
-/* ═══════════════════════════════════════════════════════════════════════
-   🫧 LIQUID GLASS ENGINE — shuding/liquid-glass SDF refraction
-   Canvas displacement map → SVG feDisplacementMap → backdrop-filter
-═══════════════════════════════════════════════════════════════════════ */
-const LiquidGlassEngine = (() => {
-  const MAP_SIZE = 256;
-  let canvas, ctx;
-  let activeTile = null;
-  let mouseUX = 0.5, mouseUY = 0.5;
-  let rafId = null;
-  let needsUpdate = false;
-
-  function smoothStep(a, b, t) {
-    t = Math.max(0, Math.min(1, (t - a) / (b - a)));
-    return t * t * (3 - 2 * t);
-  }
-
-  function len(x, y) {
-    return Math.sqrt(x * x + y * y);
-  }
-
-  // Rounded rectangle SDF — output is negative inside, positive outside
-  function roundedRectSDF(x, y, hw, hh, r) {
-    const qx = Math.abs(x) - hw + r;
-    const qy = Math.abs(y) - hh + r;
-    return Math.min(Math.max(qx, qy), 0) + len(Math.max(qx, 0), Math.max(qy, 0)) - r;
-  }
-
-  function generateDisplacementMap() {
-    const w = MAP_SIZE;
-    const h = MAP_SIZE;
-    const data = ctx.createImageData(w, h);
-    const rawValues = [];
-    let maxScale = 0;
-
-    // Mouse offset normalized to [-0.4, 0.4]
-    const mx = (mouseUX - 0.5) * 0.5;
-    const my = (mouseUY - 0.5) * 0.5;
-
-    for (let i = 0; i < w * h; i++) {
-      const x = i % w;
-      const y = Math.floor(i / w);
-      const ux = x / w - 0.5;
-      const uy = y / h - 0.5;
-
-      // SDF for rounded rectangle filling the tile
-      const dist = roundedRectSDF(ux, uy, 0.42, 0.42, 0.48);
-
-      // Strong displacement near edges, fading to zero at center
-      // Negative dist = inside shape, displacement = 1; positive dist = outside, displacement = 0
-      const displacement = smoothStep(0.82, -0.05, dist);
-
-      // Mouse influence: stronger near center, fades near edges
-      const mouseInfluence = smoothStep(0, 0.75, displacement);
-
-      // Combine: edge-lens warp + mouse-directed bias
-      const dx = ux * displacement + mx * mouseInfluence * 0.3;
-      const dy = uy * displacement + my * mouseInfluence * 0.3;
-
-      rawValues.push(dx, dy);
-      maxScale = Math.max(maxScale, Math.abs(dx), Math.abs(dy));
-    }
-
-    maxScale = Math.max(maxScale, 0.001);
-
-    let idx = 0;
-    for (let i = 0; i < w * h * 4; i += 4) {
-      const r = rawValues[idx] / maxScale * 0.5 + 0.5;
-      const g = rawValues[idx + 1] / maxScale * 0.5 + 0.5;
-      data.data[i] = Math.round(r * 255);
-      data.data[i + 1] = Math.round(g * 255);
-      data.data[i + 2] = 0;
-      data.data[i + 3] = 255;
-      idx += 2;
-    }
-
-    ctx.putImageData(data, 0, 0);
-
-    const mapEl = document.getElementById('lg-displacement-map');
-    if (mapEl) {
-      const dataUrl = canvas.toDataURL();
-      mapEl.setAttributeNS('http://www.w3.org/1999/xlink', 'href', dataUrl);
-      mapEl.setAttribute('href', dataUrl);
-    }
-  }
-
-  function renderLoop() {
-    if (needsUpdate && (activeTile || modalCardEl)) {
-      generateDisplacementMap();
-      needsUpdate = false;
-    }
-    rafId = requestAnimationFrame(renderLoop);
-  }
-
-  function init() {
-    canvas = document.createElement('canvas');
-    canvas.width = MAP_SIZE;
-    canvas.height = MAP_SIZE;
-    canvas.style.display = 'none';
-    canvas.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(canvas);
-    ctx = canvas.getContext('2d');
-
-    generateDisplacementMap();
-    rafId = requestAnimationFrame(renderLoop);
-  }
-
-  function attach(tile) {
-    tile.addEventListener('mouseenter', (e) => {
-      if (activeTile && activeTile !== tile) {
-        activeTile.classList.remove('liquid-glass-active');
-        activeTile.style.transform = '';
-        activeTile.style.removeProperty('--mouse-x');
-        activeTile.style.removeProperty('--mouse-y');
-      }
-      activeTile = tile;
-      const rect = tile.getBoundingClientRect();
-      const xPct = ((e.clientX - rect.left) / rect.width) * 100;
-      const yPct = ((e.clientY - rect.top) / rect.height) * 100;
-      mouseUX = xPct / 100;
-      mouseUY = yPct / 100;
-      tile.style.setProperty('--mouse-x', `${xPct}%`);
-      tile.style.setProperty('--mouse-y', `${yPct}%`);
-      tile.classList.add('liquid-glass-active');
-      needsUpdate = true;
+/* ============================================================
+   1. RENDER LEGEND
+   ============================================================ */
+function renderLegend() {
+    const container = document.getElementById('legend');
+    container.innerHTML = '';
+    Object.entries(CATEGORIES).forEach(([key, {color, colorDark}]) => {
+        const item = document.createElement('div');
+        item.className = 'legend-item';
+        const swatch = document.createElement('span');
+        swatch.className = 'legend-swatch';
+        swatch.dataset.colorLight = color;
+        swatch.dataset.colorDark = colorDark;
+        swatch.style.background = isDark ? colorDark : color;
+        item.appendChild(swatch);
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'legend-label';
+        labelSpan.dataset.cat = key;
+        labelSpan.textContent = getCategoryLabel(key);
+        item.appendChild(labelSpan);
+        container.appendChild(item);
     });
+}
+renderLegend();
 
-    tile.addEventListener('mousemove', (e) => {
-      if (activeTile !== tile) return;
-      const rect = tile.getBoundingClientRect();
-      const xPct = ((e.clientX - rect.left) / rect.width) * 100;
-      const yPct = ((e.clientY - rect.top) / rect.height) * 100;
-      mouseUX = xPct / 100;
-      mouseUY = yPct / 100;
-      needsUpdate = true;
-
-      tile.style.setProperty('--mouse-x', `${xPct}%`);
-      tile.style.setProperty('--mouse-y', `${yPct}%`);
-
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      const tiltX = e.clientX - rect.left - centerX;
-      const tiltY = e.clientY - rect.top - centerY;
-      tile.style.transform = `scale(1.14) translateY(-6px) perspective(600px) rotateX(${-tiltY * 0.06}deg) rotateY(${tiltX * 0.06}deg)`;
+// Unified theme observer — updates isDark + legend swatches + meta theme-color
+const themeObserver = new MutationObserver(() => {
+    isDark = root.getAttribute('data-theme') === 'dark';
+    document.querySelectorAll('.legend-swatch').forEach(s => {
+        s.style.background = isDark ? s.dataset.colorDark : s.dataset.colorLight;
     });
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) metaTheme.content = isDark ? '#0a0a14' : '#f8f9fd';
+});
+themeObserver.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
 
-    tile.addEventListener('mouseleave', () => {
-      if (activeTile === tile) {
-        tile.classList.remove('liquid-glass-active');
-        tile.style.transform = '';
-        tile.style.removeProperty('--mouse-x');
-        tile.style.removeProperty('--mouse-y');
-        activeTile = null;
-      }
-    });
-  }
+/* ============================================================
+   2. BUILD PERIODIC TABLE
+   ============================================================ */
+(function buildTable() {
+    const table = document.getElementById('periodic-table');
 
-  /* ── Modal attachment — same SDF refraction on the modal card ── */
-  let modalCardEl = null;
-  let modalMouseHandler = null;
-
-  function attachModal(card) {
-    if (modalCardEl) detachModal();
-    modalCardEl = card;
-    modalMouseHandler = (e) => {
-      if (!modalCardEl) return;
-      const rect = modalCardEl.getBoundingClientRect();
-      mouseUX = (e.clientX - rect.left) / rect.width;
-      mouseUY = (e.clientY - rect.top) / rect.height;
-      needsUpdate = true;
-    };
-    document.addEventListener('mousemove', modalMouseHandler);
-    needsUpdate = true;
-  }
-
-  function detachModal() {
-    if (modalMouseHandler) {
-      document.removeEventListener('mousemove', modalMouseHandler);
-      modalMouseHandler = null;
+    // Group labels (row 1, cols 2-19)
+    for (let g = 1; g <= 18; g++) {
+        const label = document.createElement('div');
+        label.className = 'group-label';
+        label.style.gridRow = 1;
+        label.style.gridColumn = g + 1;
+        label.textContent = g;
+        table.appendChild(label);
     }
-    modalCardEl = null;
-  }
 
-  return { init, attach, attachModal, detachModal };
+    // Period labels (col 1, rows 2-8)
+    for (let p = 1; p <= 7; p++) {
+        const label = document.createElement('div');
+        label.className = 'period-label';
+        label.style.gridRow = p + 1;
+        label.style.gridColumn = 1;
+        label.textContent = p;
+        table.appendChild(label);
+    }
+
+    // Lanthanide/Actinide row labels
+    const lanLabel = document.createElement('div');
+    lanLabel.className = 'period-label';
+    lanLabel.style.gridRow = 10;
+    lanLabel.style.gridColumn = 1;
+    lanLabel.style.fontSize = '0.5rem';
+    lanLabel.textContent = '57-71';
+    table.appendChild(lanLabel);
+
+    const actLabel = document.createElement('div');
+    actLabel.className = 'period-label';
+    actLabel.style.gridRow = 11;
+    actLabel.style.gridColumn = 1;
+    actLabel.style.fontSize = '0.5rem';
+    actLabel.textContent = '89-103';
+    table.appendChild(actLabel);
+
+    function createCell(el, pos) {
+        const cell = document.createElement('div');
+        cell.className = 'element';
+        cell.dataset.category = el.cat;
+        cell.dataset.z = el.z;
+        cell.style.gridRow = pos[0];
+        cell.style.gridColumn = pos[1];
+        cell.innerHTML = `
+            <span class="atomic-number">${el.z}</span>
+            <span class="symbol">${el.sym}</span>
+            <span class="name" data-i18n-el="${el.z}">${getElementName(el.z)}</span>
+            <span class="mass">${formatMass(el.mass, 2)}</span>
+        `;
+        cell.addEventListener('click', () => openDetail(el));
+        table.appendChild(cell);
+    }
+
+    ELEMENTS.forEach(el => {
+        const pos = GRID[el.z];
+        if (!pos) return;
+        createCell(el, pos);
+        // La and Ac also appear in main table rows
+        const extraPos = EXTRA_GRID[el.z];
+        if (extraPos) createCell(el, extraPos);
+    });
 })();
 
-/* ═══════════════════════════════════════════════════════════════════════
-   Build Periodic Grid
-═══════════════════════════════════════════════════════════════════════ */
-const grid = document.getElementById('periodicGrid');
+/* ============================================================
+   3. DETAIL PANEL
+   ============================================================ */
+const overlay = document.getElementById('overlay');
+const closeBtn = document.getElementById('close-btn');
 
-function getGridPos(el) {
-  if (el.period === 9) {
-    const idx = el.z - 58;
-    return { col: idx + 4, row: 9 };
-  }
-  if (el.period === 10) {
-    const idx = el.z - 90;
-    return { col: idx + 4, row: 10 };
-  }
-  const col = el.group;
-  let row = el.period;
-  return { col, row };
+// Cached DOM references
+const $badgeSymbol = document.getElementById('badge-symbol');
+const $badgeName = document.getElementById('badge-name');
+const $badgeSubtitle = document.getElementById('badge-subtitle');
+const $detailInfo = document.getElementById('detail-info');
+const $titleText = document.getElementById('title-text');
+const $langLabel = document.getElementById('lang-label');
+const $atomLabel = document.getElementById('atom-label');
+const $modeBohr = document.getElementById('mode-bohr');
+const $modeOrbital = document.getElementById('mode-orbital');
+
+closeBtn.addEventListener('click', closeDetail);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeDetail(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
+
+let currentDetailEl = null;
+
+function updateDetailText(el) {
+    $badgeSymbol.textContent = el.sym;
+    const catData = CATEGORIES[el.cat];
+    $badgeSymbol.style.background = (isDark ? catData?.colorDark : catData?.color) || 'rgba(255,255,255,0.5)';
+
+    $badgeName.textContent = getElementName(el.z);
+    $badgeSubtitle.textContent = currentLang === 'zh'
+        ? `${t('elementPrefix')}${el.z}号元素 · ${getCategoryLabel(el.cat)}`
+        : `${t('elementPrefix')} ${el.z} · ${getCategoryLabel(el.cat)}`;
+
+    $detailInfo.innerHTML = '';
+    const rows = [
+        [t('atomicNumber'), el.z],
+        [t('atomicMass'), formatMass(el.mass, 3) + ' u'],
+        [t('category'), getCategoryLabel(el.cat)],
+        [t('yearDiscovered'), el.year === 0 ? t('ancient') : el.year],
+    ];
+    rows.forEach(([label, value]) => {
+        const row = document.createElement('div');
+        row.className = 'info-row';
+        row.innerHTML = `<span class="label">${label}</span><span class="value">${value}</span>`;
+        $detailInfo.appendChild(row);
+    });
+
+    const cfg = document.createElement('div');
+    cfg.className = 'electron-config';
+    cfg.innerHTML = `<div class="label">${t('electronConfig')}</div><div class="value">${el.config}</div>`;
+    $detailInfo.appendChild(cfg);
+
+    const shellSection = document.createElement('div');
+    shellSection.className = 'electron-config';
+    shellSection.innerHTML = `<div class="label">${t('electronShells')}</div><div class="shells-display">${
+        el.shells.map((s, i) => `<span class="shell-chip">${i+1}: ${s}e⁻</span>`).join('')
+    }</div>`;
+    $detailInfo.appendChild(shellSection);
 }
 
-ELEMENTS.forEach((el, idx) => {
-  const tile = document.createElement('div');
-  tile.className = 'element';
-  tile.dataset.z = el.z;
-  tile.dataset.cat = el.cat;
+function openDetail(el) {
+    currentDetailEl = el;
+    updateDetailText(el);
 
-  const colorMap = {
-    "alkali": "var(--c-alkali)",
-    "alkaline": "var(--c-alkaline)",
-    "lanthanide": "var(--c-lanthanide)",
-    "actinide": "var(--c-actinide)",
-    "transition": "var(--c-transition)",
-    "post-trans": "var(--c-post-trans)",
-    "metalloid": "var(--c-metalloid)",
-    "nonmetal": "var(--c-nonmetal)",
-    "halogen": "var(--c-halogen)",
-    "noble-gas": "var(--c-noble)",
-    "unknown": "var(--c-unknown)",
-  };
-  tile.style.setProperty('--cat-color', colorMap[el.cat] || 'rgba(255,255,247,0.2)');
+    overlay.classList.add('active');
 
-  tile.style.animationDelay = `${0.008 * idx}s`;
+    $modeBohr.classList.toggle('active', viewMode === 'bohr');
+    $modeOrbital.classList.toggle('active', viewMode === 'orbital');
 
-  const displayName = getElName(el);
-  tile.innerHTML = `
-    <div class="liquid-glass-inner"></div>
-    <div class="el-cat-dot"></div>
-    <div class="category-glow"></div>
-    <span class="el-number">${el.z}</span>
-    <span class="el-symbol">${el.sym}</span>
-    <span class="el-name">${displayName}</span>
-    <span class="el-mass">${el.mass}</span>
-  `;
+    buildAtom(el);
+}
 
-  const pos = getGridPos(el);
-  tile.style.gridColumn = pos.col;
-  tile.style.gridRow = pos.row;
+function closeDetail() {
+    overlay.classList.remove('active');
+    destroyAtom();
+    currentDetailEl = null;
+}
 
-  // Liquid Glass Engine — per-tile SDF distortion
-  LiquidGlassEngine.attach(tile);
+/* ============================================================
+   LANGUAGE SWITCHING
+   ============================================================ */
+function switchLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('pt-lang', lang);
 
-  tile.addEventListener('mouseenter', e => {
-    showTooltip(e, el);
-  });
+    $titleText.textContent = t('title');
+    $langLabel.textContent = lang === 'en' ? 'EN' : '中';
+    $atomLabel.textContent = t('atomLabel');
+    if ($modeBohr) $modeBohr.textContent = t('modeBohr');
+    if ($modeOrbital) $modeOrbital.textContent = t('modeOrbital');
 
-  tile.addEventListener('mouseleave', () => {
-    hideTooltip();
-  });
+    document.querySelectorAll('.legend-label').forEach(span => {
+        span.textContent = getCategoryLabel(span.dataset.cat);
+    });
 
-  tile.addEventListener('click', () => {
-    tile.style.transition = 'transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-    tile.style.transform = 'scale(0.98)';
-    setTimeout(() => {
-      tile.style.transition = '';
-    }, 150);
-    openModal(el);
-  });
+    document.querySelectorAll('[data-i18n-el]').forEach(span => {
+        span.textContent = getElementName(parseInt(span.dataset.i18nEl));
+    });
 
-  grid.appendChild(tile);
+    // Update detail panel text only (no 3D rebuild)
+    if (currentDetailEl) updateDetailText(currentDetailEl);
+}
+
+const langToggle = document.getElementById('lang-toggle');
+langToggle.addEventListener('click', () => {
+    switchLang(currentLang === 'en' ? 'zh' : 'en');
 });
 
-function makeRowLabel(text, col, row) {
-  const label = document.createElement('div');
-  label.style.gridColumn = `${col}`;
-  label.style.gridRow = `${row}`;
-  label.style.display = 'flex';
-  label.style.alignItems = 'center';
-  label.style.justifyContent = 'flex-end';
-  label.style.paddingRight = '6px';
-  label.style.fontSize = '9px';
-  label.style.color = 'var(--text-muted)';
-  label.style.letterSpacing = '0.4px';
-  label.style.textTransform = 'uppercase';
-  label.style.fontWeight = '500';
-  label.textContent = text;
-  grid.appendChild(label);
-}
-makeRowLabel('Ln', 3, 9);
-makeRowLabel('An', 3, 10);
+$langLabel.textContent = currentLang === 'en' ? 'EN' : '中';
 
-/* ═══════════════════════════════════════════════════════════════════════
-   Tooltip
-═══════════════════════════════════════════════════════════════════════ */
-const tooltip = document.getElementById('tooltip');
-let tooltipVisible = false;
+/* ============================================================
+   4. THREE.JS — 3D ATOMIC VISUALIZATION
+   ============================================================ */
+let scene, camera, renderer, animId;
+let atomGroup;
+let viewMode = 'bohr'; // 'bohr' | 'orbital'
+let abortController = null;
+let animTime = 0;
 
-function showTooltip(e, el) {
-  const name = getElName(el);
-  const catLabel = getCatLabel(el.cat);
-  tooltip.textContent = `${name} — ${catLabel}`;
-  tooltip.classList.add('show');
-  tooltipVisible = true;
+function switchViewMode(mode) {
+    if (mode === viewMode) return;
+    viewMode = mode;
+    $modeBohr.classList.toggle('active', mode === 'bohr');
+    $modeOrbital.classList.toggle('active', mode === 'orbital');
+    if (currentDetailEl) buildAtom(currentDetailEl);
 }
 
-function hideTooltip() {
-  tooltip.classList.remove('show');
-  tooltipVisible = false;
-}
+$modeBohr.addEventListener('click', () => switchViewMode('bohr'));
+$modeOrbital.addEventListener('click', () => switchViewMode('orbital'));
 
-function moveTooltip(e) {
-  if (!tooltipVisible) return;
-  tooltip.style.left = `${e.clientX}px`;
-  tooltip.style.top = `${e.clientY}px`;
-}
+/* ============================================================
+   ELECTRON CONFIG PARSER
+   ============================================================ */
+const NOBLE_GAS_CORES = {
+    '[He]': '1s2',
+    '[Ne]': '1s2 2s2 2p6',
+    '[Ar]': '1s2 2s2 2p6 3s2 3p6',
+    '[Kr]': '1s2 2s2 2p6 3s2 3p6 3d10 4s2 4p6',
+    '[Xe]': '1s2 2s2 2p6 3s2 3p6 3d10 4s2 4p6 4d10 5s2 5p6',
+    '[Rn]': '1s2 2s2 2p6 3s2 3p6 3d10 4s2 4p6 4d10 4f14 5s2 5p6 5d10 6s2 6p6'
+};
 
-/* ═══════════════════════════════════════════════════════════════════════
-   Search
-═══════════════════════════════════════════════════════════════════════ */
-document.getElementById('searchInput').addEventListener('input', function() {
-  const q = this.value.toLowerCase().trim();
-  const tiles = document.querySelectorAll('.element');
-  if (!q) {
-    tiles.forEach(t => t.classList.remove('dimmed','highlighted'));
-    return;
-  }
-  tiles.forEach(t => {
-    const z = parseInt(t.dataset.z);
-    const el = ELEMENTS[z - 1];
-    const match = el.name.toLowerCase().includes(q)
-      || el.name_zh.includes(q)
-      || el.sym.toLowerCase().includes(q)
-      || String(el.z) === q;
-    if (match) {
-      t.classList.remove('dimmed'); t.classList.add('highlighted');
-    } else {
-      t.classList.add('dimmed'); t.classList.remove('highlighted');
+function parseElectronConfig(configStr) {
+    let expanded = configStr;
+    for (const [core, full] of Object.entries(NOBLE_GAS_CORES)) {
+        expanded = expanded.replace(core, full);
     }
-  });
-});
-
-/* ═══════════════════════════════════════════════════════════════════════
-   Modal
-═══════════════════════════════════════════════════════════════════════ */
-const overlay = document.getElementById('modalOverlay');
-const detailPanel = document.getElementById('modalDetail');
-const closeBtn = document.getElementById('modalClose');
-let threeRenderer, threeScene, threeCamera, threeAnimId;
-let isDragging = false, prevMouse = {x:0,y:0}, atomGroup;
-
-function renderModalDetail(el) {
-  const colorMap = {
-    "alkali":"var(--c-alkali)","alkaline":"var(--c-alkaline)",
-    "lanthanide":"var(--c-lanthanide)","actinide":"var(--c-actinide)",
-    "transition":"var(--c-transition)","post-trans":"var(--c-post-trans)",
-    "metalloid":"var(--c-metalloid)","nonmetal":"var(--c-nonmetal)",
-    "halogen":"var(--c-halogen)","noble-gas":"var(--c-noble)","unknown":"var(--c-unknown)"
-  };
-  const catColor = colorMap[el.cat] || 'rgba(255,255,247,0.5)';
-  const catLabel = getCatLabel(el.cat);
-  const displayName = getElName(el);
-  const stateClass = { solid:'state-solid', liquid:'state-liquid', gas:'state-gas', unknown:'state-unknown' }[el.state] || 'state-unknown';
-  const stateIcon = { solid:'\u2B1B', liquid:'\uD83D\uDCA7', gas:'\uD83D\uDCA8', unknown:'?' }[el.state] || '?';
-  const stateLabel = t('state_' + el.state);
-  const discovery = el.year ? `${el.year}` : t('ancient_unknown');
-  const groupPeriod = (el.group ? t('group_label') + ' ' + el.group : t('f_block'))
-    + ' · ' + t('period_label') + ' ' + (el.period <= 8 ? el.period : el.period === 9 ? 6 : 7);
-
-  detailPanel.dataset.z = el.z;
-  detailPanel.innerHTML = `
-    <div class="detail-category" style="color:${catColor}">${catLabel}</div>
-    <div class="detail-symbol-row">
-      <span class="detail-symbol">${el.sym}</span>
-      <span class="detail-number">#${el.z}</span>
-    </div>
-    <div class="detail-name">${displayName}</div>
-    <div class="detail-divider"></div>
-    <div class="detail-grid">
-      <div class="detail-field">
-        <span class="detail-label">${t('detail_atomic_mass')}</span>
-        <span class="detail-value">${el.mass} u</span>
-      </div>
-      <div class="detail-field">
-        <span class="detail-label">${t('detail_year_discovered')}</span>
-        <span class="detail-value">${discovery}</span>
-      </div>
-      <div class="detail-field full">
-        <span class="detail-label">${t('detail_electron_config')}</span>
-        <span class="detail-value mono">${el.config}</span>
-      </div>
-      <div class="detail-field">
-        <span class="detail-label">${t('detail_state')}</span>
-        <span class="detail-value"><span class="state-badge ${stateClass}">${stateIcon} ${stateLabel}</span></span>
-      </div>
-      <div class="detail-field">
-        <span class="detail-label">${t('detail_group_period')}</span>
-        <span class="detail-value">${groupPeriod}</span>
-      </div>
-    </div>
-  `;
+    const regex = /(\d+)([spdf])(\d+)/g;
+    const orbitals = [];
+    let match;
+    while ((match = regex.exec(expanded)) !== null) {
+        orbitals.push({
+            n: parseInt(match[1]),
+            l: match[2],
+            electrons: parseInt(match[3])
+        });
+    }
+    return orbitals;
 }
 
-function openModal(el) {
-  renderModalDetail(el);
-  overlay.classList.add('open');
-  document.body.style.overflow = 'hidden';
-  const card = document.getElementById('modalCard');
-  LiquidGlassEngine.attachModal(card);
-  requestAnimationFrame(() => buildAtomScene(el));
+/* ============================================================
+   ORBITAL COLOR PALETTE
+   ============================================================ */
+const ORBITAL_COLORS = {
+    s: { light: 0x4fc3f7, dark: 0x64b5f6 },
+    p: { light: 0x81c784, dark: 0xa5d6a7 },
+    d: { light: 0xffb74d, dark: 0xffcc80 },
+    f: { light: 0xce93d8, dark: 0xba68c8 }
+};
+
+function orbitalRadius(n) {
+    return 1.5 + n * 1.1;
 }
 
-function closeModal() {
-  overlay.classList.remove('open');
-  document.body.style.overflow = '';
-  detailPanel.dataset.z = '';
-  LiquidGlassEngine.detachModal();
-  destroyThree();
+function orbitalOpacity(n, maxN, dark) {
+    const base = dark ? 0.18 : 0.22;
+    const range = dark ? 0.22 : 0.23;
+    const normalizedN = (n - 1) / Math.max(maxN - 1, 1);
+    return base + normalizedN * range;
 }
 
-closeBtn.addEventListener('click', closeModal);
-overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-/* ═══════════════════════════════════════════════════════════════════════
-   THREE.JS Atomic Visualisation
-═══════════════════════════════════════════════════════════════════════ */
-function destroyThree() {
-  if (threeAnimId) cancelAnimationFrame(threeAnimId);
-  const canvas = document.getElementById('three-canvas');
-  if (canvas) {
-    canvas.removeEventListener('mousedown', onDragStart);
-    canvas.removeEventListener('mousemove', onDragMove);
-    canvas.removeEventListener('mouseup', onDragEnd);
-    canvas.removeEventListener('touchstart', onTouchStart);
-    canvas.removeEventListener('touchmove', onTouchMove);
-    canvas.removeEventListener('touchend', onDragEnd);
-  }
-  if (threeRenderer) {
-    threeRenderer.dispose();
-    threeRenderer = null;
-  }
-  threeScene = null; threeCamera = null; atomGroup = null;
-}
-
-function buildAtomScene(el) {
-  destroyThree();
-  const canvas = document.getElementById('three-canvas');
-  const container = document.getElementById('modal3d');
-  const W = container.clientWidth || 360;
-  const H = container.clientHeight || 280;
-
-  threeRenderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  threeRenderer.setSize(W, H);
-  threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  threeRenderer.setClearColor(0x000000, 0);
-
-  threeScene = new THREE.Scene();
-  threeCamera = new THREE.PerspectiveCamera(50, W / H, 0.1, 100);
-  threeCamera.position.set(0, 0, 6);
-
-  threeScene.add(new THREE.AmbientLight(0xffffff, 0.6));
-  const pLight = new THREE.PointLight(0x7fc8ff, 2, 20);
-  pLight.position.set(4, 4, 4);
-  threeScene.add(pLight);
-  const pLight2 = new THREE.PointLight(0xff9fcc, 1.5, 20);
-  pLight2.position.set(-4, -3, 2);
-  threeScene.add(pLight2);
-
-  atomGroup = new THREE.Group();
-  threeScene.add(atomGroup);
-
-  const nucleusGroup = new THREE.Group();
-  const numNucleons = Math.min(el.z, 20);
-  const nucleonGeo = new THREE.SphereGeometry(0.12, 8, 8);
-  for (let i = 0; i < numNucleons; i++) {
-    const isProton = i < el.z;
+/* ============================================================
+   ORBITAL SHAPE BUILDERS
+   ============================================================ */
+function createSOrbital(radius, color, opacity, dark) {
+    const group = new THREE.Group();
+    const geo = new THREE.SphereGeometry(radius * 0.35, 32, 32);
     const mat = new THREE.MeshPhongMaterial({
-      color: isProton ? 0xff6b9d : 0x4fc3f7,
-      shininess: 120, specular: 0xffffff,
+        color: color, emissive: color, emissiveIntensity: dark ? 0.35 : 0.25,
+        transparent: true, opacity: opacity, side: THREE.DoubleSide, shininess: 40
     });
-    const nucl = new THREE.Mesh(nucleonGeo, mat);
-    const theta = (i / numNucleons) * Math.PI * 2;
-    const phi = Math.acos(2 * (i / numNucleons) - 1);
-    const r = 0.25 + (i % 3) * 0.1;
-    nucl.position.set(
-      r * Math.sin(phi) * Math.cos(theta),
-      r * Math.sin(phi) * Math.sin(theta),
-      r * Math.cos(phi)
-    );
-    nucleusGroup.add(nucl);
-  }
-  atomGroup.add(nucleusGroup);
-
-  const shells = getShellConfig(el.z);
-  const shellColors = [0x4fc3f7, 0x7c83f5, 0xff6b9d, 0xffe066, 0x7ee8a2, 0xffaa5c, 0xce93d8];
-
-  shells.forEach((electrons, shellIdx) => {
-    const radius = 0.9 + shellIdx * 0.75;
-    const ringGeo = new THREE.TorusGeometry(radius, 0.012, 6, 80);
-    const ringMat = new THREE.MeshBasicMaterial({
-      color: shellColors[shellIdx % shellColors.length],
-      opacity: 0.3, transparent: true,
+    group.add(new THREE.Mesh(geo, mat));
+    const wireGeo = new THREE.SphereGeometry(radius * 0.36, 16, 16);
+    const wireMat = new THREE.MeshBasicMaterial({
+        color: color, wireframe: true, transparent: true, opacity: opacity * 0.3
     });
-    const ring = new THREE.Mesh(ringGeo, ringMat);
-    ring.rotation.x = (shellIdx * 0.7 + 0.4);
-    ring.rotation.y = (shellIdx * 0.5);
-    atomGroup.add(ring);
+    group.add(new THREE.Mesh(wireGeo, wireMat));
+    return group;
+}
 
-    const eMat = new THREE.MeshPhongMaterial({
-      color: shellColors[shellIdx % shellColors.length],
-      emissive: shellColors[shellIdx % shellColors.length],
-      emissiveIntensity: 0.4,
-      shininess: 200,
+function createPOrbital(radius, color, opacity, dark, axis) {
+    const group = new THREE.Group();
+    const lobeSize = radius * 0.22;
+    const offset = radius * 0.35;
+    const geo = new THREE.SphereGeometry(lobeSize, 24, 24);
+    const mat = new THREE.MeshPhongMaterial({
+        color: color, emissive: color, emissiveIntensity: dark ? 0.35 : 0.25,
+        transparent: true, opacity: opacity, side: THREE.DoubleSide, shininess: 40
     });
-    const eGeo = new THREE.SphereGeometry(0.07, 10, 10);
-
-    for (let e = 0; e < electrons; e++) {
-      const electronPivot = new THREE.Object3D();
-      electronPivot.rotation.x = ring.rotation.x;
-      electronPivot.rotation.y = ring.rotation.y;
-      const electronMesh = new THREE.Mesh(eGeo, eMat);
-      const angle = (e / electrons) * Math.PI * 2;
-      electronMesh.position.set(
-        radius * Math.cos(angle),
-        radius * Math.sin(angle),
-        0
-      );
-      electronPivot.add(electronMesh);
-      electronPivot.userData.speed = 0.4 + shellIdx * 0.2 + e * 0.01;
-      electronPivot.userData.isElectron = true;
-      electronPivot.userData.radius = radius;
-      electronPivot.userData.angle = angle;
-      electronPivot.userData.shellIdx = shellIdx;
-      atomGroup.add(electronPivot);
+    for (let sign = -1; sign <= 1; sign += 2) {
+        const lobe = new THREE.Mesh(geo, mat);
+        const sO = 0.7, sM = 2.0;
+        if (axis === 'x') lobe.scale.set(sM, sO, sO);
+        else if (axis === 'y') lobe.scale.set(sO, sM, sO);
+        else lobe.scale.set(sO, sO, sM);
+        lobe.position[axis] = sign * offset;
+        group.add(lobe);
     }
-  });
+    return group;
+}
 
-  canvas.addEventListener('mousedown', onDragStart);
-  canvas.addEventListener('mousemove', onDragMove);
-  canvas.addEventListener('mouseup', onDragEnd);
-  canvas.addEventListener('touchstart', onTouchStart, { passive: true });
-  canvas.addEventListener('touchmove', onTouchMove, { passive: true });
-  canvas.addEventListener('touchend', onDragEnd);
+function createDOrbital(radius, color, opacity, dark) {
+    const group = new THREE.Group();
+    const lobeSize = radius * 0.16;
+    const offset = radius * 0.3;
+    const geo = new THREE.SphereGeometry(lobeSize, 20, 20);
+    const mat = new THREE.MeshPhongMaterial({
+        color: color, emissive: color, emissiveIntensity: dark ? 0.35 : 0.25,
+        transparent: true, opacity: opacity, side: THREE.DoubleSide, shininess: 40
+    });
+    const angles = [Math.PI/4, 3*Math.PI/4, 5*Math.PI/4, 7*Math.PI/4];
+    angles.forEach(angle => {
+        const lobe = new THREE.Mesh(geo, mat);
+        lobe.scale.set(2.0, 0.7, 0.7);
+        lobe.position.x = Math.cos(angle) * offset;
+        lobe.position.y = Math.sin(angle) * offset;
+        lobe.rotation.z = angle;
+        group.add(lobe);
+    });
+    return group;
+}
 
-  let t = 0;
-  function animate() {
-    threeAnimId = requestAnimationFrame(animate);
-    t += 0.012;
-    nucleusGroup.rotation.y = t * 0.3;
-    nucleusGroup.rotation.x = t * 0.2;
+function createFOrbital(radius, color, opacity, dark) {
+    const group = new THREE.Group();
+    const lobeSize = radius * 0.12;
+    const offset = radius * 0.25;
+    const geo = new THREE.SphereGeometry(lobeSize, 16, 16);
+    const mat = new THREE.MeshPhongMaterial({
+        color: color, emissive: color, emissiveIntensity: dark ? 0.35 : 0.25,
+        transparent: true, opacity: opacity, side: THREE.DoubleSide, shininess: 40
+    });
+    ['x', 'y', 'z'].forEach(axis => {
+        for (let sign = -1; sign <= 1; sign += 2) {
+            const lobe = new THREE.Mesh(geo, mat);
+            lobe.scale.set(0.7, 0.7, 2.0);
+            lobe.position[axis] = sign * offset;
+            if (axis === 'x') lobe.rotation.z = sign * 0.3;
+            if (axis === 'y') lobe.rotation.x = sign * 0.3;
+            if (axis === 'z') lobe.rotation.y = sign * 0.3;
+            group.add(lobe);
+        }
+    });
+    return group;
+}
+
+/* ============================================================
+   BUILD BOHR CONTENT (existing orbit rings + electrons)
+   ============================================================ */
+function buildBohrContent(el, dark) {
+    const shells = el.shells;
+    const shellColors = [0x4fc3f7, 0x7c83f5, 0xff6b9d, 0xffe066, 0x7ee8a2, 0xffaa5c, 0xce93d8];
+
+    shells.forEach((electronCount, i) => {
+        const radius = 0.9 + i * 0.75;
+        const color = shellColors[i % shellColors.length];
+        const rotX = i * 0.7 + 0.4;
+        const rotY = i * 0.5;
+
+        const ringGeo = new THREE.TorusGeometry(radius, 0.012, 6, 80);
+        const ringMat = new THREE.MeshBasicMaterial({
+            color: color, transparent: true, opacity: 0.3
+        });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.rotation.x = rotX;
+        ring.rotation.y = rotY;
+        atomGroup.add(ring);
+
+        const electronGeo = new THREE.SphereGeometry(0.07, 10, 10);
+        const electronMat = new THREE.MeshPhongMaterial({
+            color: color, emissive: color, emissiveIntensity: 0.4,
+            shininess: 200
+        });
+
+        for (let e = 0; e < electronCount; e++) {
+            const angle = (e / electronCount) * Math.PI * 2;
+            const pivot = new THREE.Object3D();
+            pivot.rotation.x = rotX;
+            pivot.rotation.y = rotY;
+            const electron = new THREE.Mesh(electronGeo, electronMat);
+            electron.position.set(
+                radius * Math.cos(angle),
+                radius * Math.sin(angle),
+                0
+            );
+            pivot.add(electron);
+            pivot.userData = {
+                isElectron: true,
+                radius: radius,
+                angle: angle,
+                speed: 0.4 + i * 0.2 + e * 0.01,
+                shellIdx: i
+            };
+            atomGroup.add(pivot);
+        }
+    });
+}
+
+/* ============================================================
+   BUILD ORBITAL CONTENT (s/p/d/f shapes)
+   ============================================================ */
+function buildOrbitalContent(el, dark) {
+    const orbitals = parseElectronConfig(el.config);
+    const maxN = Math.max(...orbitals.map(o => o.n));
+
+    orbitals.forEach(orb => {
+        const r = orbitalRadius(orb.n);
+        const color = dark ? ORBITAL_COLORS[orb.l].dark : ORBITAL_COLORS[orb.l].light;
+        const opacity = orbitalOpacity(orb.n, maxN, dark);
+
+        let shape;
+        switch (orb.l) {
+            case 's':
+                shape = createSOrbital(r, color, opacity, dark);
+                break;
+            case 'p':
+                shape = createPOrbital(r, color, opacity, dark, 'z');
+                const px = createPOrbital(r, color, opacity, dark, 'x');
+                const py = createPOrbital(r, color, opacity, dark, 'y');
+                px.children.forEach(c => shape.add(c.clone()));
+                py.children.forEach(c => shape.add(c.clone()));
+                break;
+            case 'd':
+                shape = createDOrbital(r, color, opacity, dark);
+                break;
+            case 'f':
+                shape = createFOrbital(r, color, opacity, dark);
+                break;
+        }
+
+        if (shape) {
+            shape.userData = { orbitalType: orb.l, n: orb.n };
+            atomGroup.add(shape);
+        }
+    });
+}
+
+/* ============================================================
+   ANIMATION HELPERS
+   ============================================================ */
+function animateBohrElectrons(nucleusGroup) {
+    nucleusGroup.rotation.y = animTime * 0.3;
+    nucleusGroup.rotation.x = animTime * 0.2;
 
     atomGroup.children.forEach(child => {
-      if (child.userData.isElectron) {
-        const si = child.userData.shellIdx;
-        const speed = child.userData.speed;
-        const newAngle = child.userData.angle + t * speed;
-        const r = child.userData.radius;
-        const mesh = child.children[0];
-        mesh.position.set(r * Math.cos(newAngle), r * Math.sin(newAngle), 0);
-      }
+        if (child.userData && child.userData.isElectron) {
+            const d = child.userData;
+            const newAngle = d.angle + animTime * d.speed;
+            const mesh = child.children[0];
+            mesh.position.set(
+                d.radius * Math.cos(newAngle),
+                d.radius * Math.sin(newAngle),
+                0
+            );
+        }
     });
-
-    threeRenderer.render(threeScene, threeCamera);
-  }
-  animate();
 }
 
-function getShellConfig(z) {
-  const maxByShell = [2, 8, 18, 32, 32, 18, 8];
-  const shells = [];
-  let remaining = z;
-  for (let cap of maxByShell) {
-    if (remaining <= 0) break;
-    const n = Math.min(remaining, cap);
-    shells.push(n);
-    remaining -= n;
-  }
-  return shells;
+function animateOrbitals() {
+    const t = Date.now() * 0.001;
+    atomGroup.children.forEach(child => {
+        if (child.userData && child.userData.orbitalType) {
+            const pulseSpeed = 0.8 + child.userData.n * 0.15;
+            child.scale.setScalar(1 + Math.sin(t * pulseSpeed) * 0.04);
+        }
+    });
 }
 
-function onDragStart(e) { isDragging = true; prevMouse = { x: e.clientX, y: e.clientY }; }
-function onDragMove(e) {
-  if (!isDragging || !atomGroup) return;
-  const dx = e.clientX - prevMouse.x;
-  const dy = e.clientY - prevMouse.y;
-  atomGroup.rotation.y += dx * 0.012;
-  atomGroup.rotation.x += dy * 0.012;
-  prevMouse = { x: e.clientX, y: e.clientY };
-}
-function onDragEnd() { isDragging = false; }
-function onTouchStart(e) {
-  if (e.touches.length === 1) onDragStart({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY });
-}
-function onTouchMove(e) {
-  if (e.touches.length === 1) onDragMove({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY });
-}
+/* ============================================================
+   BUILD ATOM — MAIN ENTRY POINT
+   ============================================================ */
+function buildAtom(el) {
+    destroyAtom();
 
-/* ═══════════════════════════════════════════════════════════════════════
-   ⭐ ANTIGRAVITY PARTICLE SYSTEM — Canvas · 118 Elements · Fluid Field
-═══════════════════════════════════════════════════════════════════════ */
+    const container = document.getElementById('atom-viewer');
+    const w = container.clientWidth || 320;
+    const h = container.clientHeight || 300;
 
-const _SYMBOLS = [
-  'H','He','Li','Be','B','C','N','O','F','Ne',
-  'Na','Mg','Al','Si','P','S','Cl','Ar','K','Ca',
-  'Sc','Ti','V','Cr','Mn','Fe','Co','Ni','Cu','Zn',
-  'Ga','Ge','As','Se','Br','Kr','Rb','Sr','Y','Zr',
-  'Nb','Mo','Tc','Ru','Rh','Pd','Ag','Cd','In','Sn',
-  'Sb','Te','I','Xe','Cs','Ba','La','Ce','Pr','Nd',
-  'Pm','Sm','Eu','Gd','Tb','Dy','Ho','Er','Tm','Yb',
-  'Lu','Hf','Ta','W','Re','Os','Ir','Pt','Au','Hg',
-  'Tl','Pb','Bi','Po','At','Rn','Fr','Ra','Ac','Th',
-  'Pa','U','Np','Pu','Am','Cm','Bk','Cf','Es','Fm',
-  'Md','No','Lr','Rf','Db','Sg','Bh','Hs','Mt','Ds',
-  'Rg','Cn','Nh','Fl','Mc','Lv','Ts','Og'
-];
+    const orbitals = viewMode === 'orbital' ? parseElectronConfig(el.config) : [];
+    const maxN = orbitals.length > 0 ? Math.max(...orbitals.map(o => o.n)) : 1;
 
-const _CD = ['#6a9df6','#80cbc4','#ffb366','#f08f8f','#9e9eff','#ce93d8','#67d1ed','#ffecb3','#ff8a80','#a5d6a7','#82b1ff','#ea80fc','#b9f6ca','#b388ff','#8c9eff','#84ffff','#ff80ab','#ccff90','#ffd740','#69f0ae','#40c4ff','#e040fb','#ff6e40','#bcaaa4'];
-const _CL = ['#1a73e8','#34a853','#f48024','#db4437','#4285f4','#8e44ad','#1aadcf','#ffc107','#e53935','#43a047','#1e88e5','#8e24aa','#00acc1','#3949ab','#7cb342','#00bcd4','#d81b60','#689f38','#ffb300','#00897b','#0288d1','#ab47bc','#f4511e','#78909c'];
+    scene = new THREE.Scene();
 
-const _canvas = document.createElement("canvas");
-_canvas.id = "particleCanvas";
-document.body.appendChild(_canvas);
-const _ctx = _canvas.getContext("2d");
-
-let _W = innerWidth;
-let _H = innerHeight;
-const _DPR = devicePixelRatio || 1;
-_canvas.width = _W * _DPR;
-_canvas.height = _H * _DPR;
-_canvas.style.width = _W + "px";
-_canvas.style.height = _H + "px";
-_ctx.setTransform(_DPR, 0, 0, _DPR, 0, 0);
-
-let _particles = [];
-let _particlesReady = false;
-
-const _mouse = { x: _W / 2, y: _H / 2, vx: 0, vy: 0 };
-
-window.addEventListener("mousemove", e => {
-  _mouse.vx = e.clientX - _mouse.x;
-  _mouse.vy = e.clientY - _mouse.y;
-  _mouse.x = e.clientX;
-  _mouse.y = e.clientY;
-});
-
-window.addEventListener("resize", () => {
-  _W = innerWidth;
-  _H = innerHeight;
-  _canvas.width = _W * _DPR;
-  _canvas.height = _H * _DPR;
-  _ctx.setTransform(_DPR, 0, 0, _DPR, 0, 0);
-  _generateParticles();
-});
-
-const _MAX_PARTICLES = 200;
-const _INITIAL_COUNT = 118;
-
-// ─── Multi-frequency flow noise (Google-style organic field) ──────────
-function _flowX(x, y, t) {
-  return Math.sin(x * 0.002 + t * 0.18 + y * 0.0015) * 0.7
-       + Math.sin(x * 0.001 + t * 0.12 + y * 0.003) * 0.5
-       + Math.cos(x * 0.003 + t * 0.08 + y * 0.001) * 0.3;
-}
-function _flowY(x, y, t) {
-  return Math.cos(y * 0.002 + t * 0.15 + x * 0.0015) * 0.7
-       + Math.cos(y * 0.001 + t * 0.10 + x * 0.003) * 0.5
-       + Math.sin(y * 0.003 + t * 0.06 + x * 0.001) * 0.3;
-}
-
-class _AParticle {
-  constructor(x, y, symIdx) {
-    this.bx = x; this.by = y;
-    this.x = x; this.y = y;
-    this.vx = 0; this.vy = 0;
-
-    this.sz = 8 + Math.random() * 16;
-    this.ci = symIdx % _CD.length;
-    this.alp = 0.2 + Math.random() * 0.2;
-    this.targetAlp = 0;
-    this.lifetime = 8000 + Math.random() * 10000;
-    this.birth = performance.now();
-    this.symIdx = symIdx;
-    this.alive = true;
-    this.noise = Math.random() * Math.PI * 2;
-  }
-
-  update(ctx, t, mx, my) {
-    if (!this.alive) return;
-
-    const age = performance.now() - this.birth;
-    if (age < 400) {
-      this.targetAlp = this.alp * (age / 400);
-    } else if (age > this.lifetime - 800) {
-      this.targetAlp = this.alp * ((this.lifetime - age) / 800);
-      if (age >= this.lifetime) { this.alive = false; return; }
+    camera = new THREE.PerspectiveCamera(50, w / h, 0.1, 100);
+    let camZ;
+    if (viewMode === 'orbital') {
+        camZ = 12 + maxN * 1.2;
     } else {
-      this.targetAlp = this.alp;
+        const numShells = el.shells.length;
+        const outerRadius = 0.9 + (numShells - 1) * 0.75;
+        camZ = (outerRadius + 0.5) / Math.tan(25 * Math.PI / 180);
     }
-    ctx.globalAlpha = Math.max(0, this.targetAlp);
+    camera.position.set(0, 0, camZ);
 
-    const dx = mx - this.x, dy = my - this.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(w, h);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0);
+    container.insertBefore(renderer.domElement, container.firstChild);
 
-    // Antigravity — particles pushed away from mouse
-    if (dist < 260 && dist > 1) {
-      const force = (260 - dist) / 260;
-      this.vx -= (dx / dist) * force * 0.4;
-      this.vy -= (dy / dist) * force * 0.4;
+    scene.add(new THREE.AmbientLight(0xffffff, isDark ? 0.4 : 0.6));
+    const pLight1 = new THREE.PointLight(0x7fc8ff, isDark ? 1.8 : 2, 20);
+    pLight1.position.set(4, 4, 4);
+    scene.add(pLight1);
+    const pLight2 = new THREE.PointLight(0xff9fcc, isDark ? 1.2 : 1.5, 20);
+    pLight2.position.set(-4, -3, 2);
+    scene.add(pLight2);
+
+    atomGroup = new THREE.Group();
+    scene.add(atomGroup);
+
+    // Nucleon visualization — reuse 2 materials instead of creating per-nucleon
+    const nucleusGroup = new THREE.Group();
+    const numNucleons = Math.min(el.z, 20);
+    const nucleonGeo = new THREE.SphereGeometry(0.12, 8, 8);
+    const protonColor = isDark ? 0xff8fab : 0xff6b9d;
+    const neutronColor = isDark ? 0x64b5f6 : 0x4fc3f7;
+    const protonMat = new THREE.MeshPhongMaterial({ color: protonColor, shininess: 120, specular: 0xffffff });
+    const neutronMat = new THREE.MeshPhongMaterial({ color: neutronColor, shininess: 120, specular: 0xffffff });
+    for (let i = 0; i < numNucleons; i++) {
+        const nucl = new THREE.Mesh(nucleonGeo, i < Math.ceil(el.z / 2) ? protonMat : neutronMat);
+        const theta = (i / numNucleons) * Math.PI * 2;
+        const phi = Math.acos(2 * (i / numNucleons) - 1);
+        const r = 0.25 + (i % 3) * 0.1;
+        nucl.position.set(
+            r * Math.sin(phi) * Math.cos(theta),
+            r * Math.sin(phi) * Math.sin(theta),
+            r * Math.cos(phi)
+        );
+        nucleusGroup.add(nucl);
+    }
+    atomGroup.add(nucleusGroup);
+
+    if (viewMode === 'bohr') {
+        buildBohrContent(el, isDark);
+    } else {
+        buildOrbitalContent(el, isDark);
     }
 
-    // Multi-frequency flow field (Google-style organic noise)
-    this.vx += _flowX(this.x, this.y, t) * 0.012;
-    this.vy += _flowY(this.x, this.y, t) * 0.012;
+    // Drag controls — pointer events only (covers touch), with AbortController
+    let isDragging = false;
+    let prevX = 0, prevY = 0;
 
-    // Spring back to base position
-    this.vx += (this.bx - this.x) * 0.0006;
-    this.vy += (this.by - this.y) * 0.0006;
+    abortController = new AbortController();
+    const signal = abortController.signal;
+    const canvas = renderer.domElement;
 
-    // Damping
-    this.vx *= 0.94;
-    this.vy *= 0.94;
+    canvas.addEventListener('pointerdown', e => {
+        isDragging = true;
+        prevX = e.clientX;
+        prevY = e.clientY;
+    }, { signal });
+    canvas.addEventListener('pointermove', e => {
+        if (!isDragging || !atomGroup) return;
+        const dx = e.clientX - prevX;
+        const dy = e.clientY - prevY;
+        atomGroup.rotation.y += dx * 0.012;
+        atomGroup.rotation.x += dy * 0.012;
+        prevX = e.clientX;
+        prevY = e.clientY;
+    }, { signal });
+    const endDrag = () => { isDragging = false; };
+    canvas.addEventListener('pointerup', endDrag, { signal });
+    canvas.addEventListener('pointerleave', endDrag, { signal });
+    canvas.addEventListener('wheel', e => {
+        e.preventDefault();
+        camera.position.z = Math.max(2, Math.min(30, camera.position.z + e.deltaY * 0.01));
+    }, { signal, passive: false });
 
-    this.x += this.vx;
-    this.y += this.vy;
+    // Animation loop — match 1.html time accumulator
+    animTime = 0;
+    function animate() {
+        if (!scene) return;
+        animId = requestAnimationFrame(animate);
+        animTime += 0.012;
 
-    ctx.fillStyle = _CURRENT_COLORS[this.ci];
-    ctx.fillText(_SYMBOLS[this.symIdx], this.x, this.y);
-  }
+        if (viewMode === 'bohr') {
+            animateBohrElectrons(nucleusGroup);
+        } else {
+            animateOrbitals();
+        }
+
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    // Resize handler
+    function onResize() {
+        const w2 = container.clientWidth;
+        const h2 = container.clientHeight;
+        camera.aspect = w2 / h2;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w2, h2);
+    }
+    window.addEventListener('resize', onResize);
+    container._resizeHandler = onResize;
 }
 
-let _CURRENT_COLORS = _CD;
+function destroyAtom() {
+    if (animId) cancelAnimationFrame(animId);
+    animId = null;
+    animTime = 0;
 
-function _spawnParticle() {
-  const x = Math.random() * _W;
-  const y = Math.random() * _H;
-  const si = (Math.random() * _SYMBOLS.length) | 0;
-  const p = new _AParticle(x, y, si);
-  p.bx = x;
-  p.by = y;
-  _particles.push(p);
-}
-
-function _drawParticles(theme, t) {
-  const ctx = _ctx, isDark = theme === "dark";
-  _CURRENT_COLORS = isDark ? _CD : _CL;
-  const mx = _mouse.x, my = _mouse.y;
-
-  // Semi-transparent clear — persistence trail (Google style)
-  ctx.fillStyle = isDark ? "rgba(10,10,15,0.15)" : "rgba(240,242,245,0.15)";
-  ctx.fillRect(0, 0, _W, _H);
-
-  // Draw with shadow
-  ctx.shadowBlur = 12;
-  ctx.shadowColor = isDark ? "rgba(79,195,247,0.4)" : "rgba(66,133,244,0.3)";
-  ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.font = "600 13px Inter, Nunito, system-ui, sans-serif";
-
-  const dead = [];
-  for (let i = 0; i < _particles.length; i++) {
-    const p = _particles[i];
-    if (!p.alive) { dead.push(i); continue; }
-    p.update(ctx, t, mx, my);
-  }
-  for (const di of dead.sort((a, b) => b - a)) _particles.splice(di, 1);
-  while (_particles.length < _MAX_PARTICLES) _spawnParticle();
-
-  ctx.globalAlpha = 1;
-  ctx.shadowBlur = 0;
-
-  // Connection lines — spatial grid culled
-  const _GCELL = 75, MAX_SQ = 5000;
-  const _gcols = (_W / _GCELL + 1) | 0;
-  const _grid = {};
-  for (let i = 0; i < _particles.length; i++) {
-    const p = _particles[i];
-    if (!p.alive) continue;
-    const gi = ((p.x / _GCELL) | 0) + ((p.y / _GCELL) | 0) * _gcols;
-    if (!_grid[gi]) _grid[gi] = [];
-    _grid[gi].push(i);
-  }
-
-  ctx.beginPath();
-  let lc = 0;
-  for (let i = 0; i < _particles.length; i++) {
-    if (!_particles[i].alive) continue;
-    const a = _particles[i];
-    const gi = ((a.x / _GCELL) | 0) + ((a.y / _GCELL) | 0) * _gcols;
-    for (let ox = -1; ox <= 1; ox++) for (let oy = -1; oy <= 1; oy++) {
-      const cell = _grid[gi + ox + oy * _gcols]; if (!cell) continue;
-      for (let ci = 0; ci < cell.length; ci++) {
-        const j = cell[ci]; if (j <= i) continue;
-        if (!_particles[j].alive) continue;
-        const b = _particles[j], dx = a.x - b.x, dy = a.y - b.y;
-        if (dx * dx + dy * dy < MAX_SQ) { ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); lc++; }
-      }
+    // Abort all canvas event listeners
+    if (abortController) {
+        abortController.abort();
+        abortController = null;
     }
-  }
-  if (lc > 0) {
-    ctx.strokeStyle = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)";
-    ctx.lineWidth = 0.4; ctx.stroke();
-  }
-}
 
-function _animate(t) {
-  if (_particlesReady) { _drawParticles(currentTheme, t); }
-  requestAnimationFrame(_animate);
-}
-
-// Assign Worker source and init
-const _WORKER_SRC2 = `
-self.onmessage = (e) => {
-  const { width, height, radius, count } = e.data;
-  const k = 30, r2 = radius * radius, cs = radius / 1.4142;
-  const gw = Math.ceil(width / cs), gh = Math.ceil(height / cs);
-  const grid = new Array(gw * gh), act = [], pts = [];
-  function ins(p) { pts.push(p); act.push(p); grid[(p.x / cs) | 0 + (p.y / cs) | 0 * gw] = p; }
-  function far(x, y) {
-    const gx = (x / cs) | 0, gy = (y / cs) | 0;
-    for (let i = -2; i <= 2; i++) for (let j = -2; j <= 2; j++) {
-      const nx = gx + i, ny = gy + j;
-      if (nx < 0 || ny < 0 || nx >= gw || ny >= gh) continue;
-      const n = grid[nx + ny * gw];
-      if (n) { const dx = n.x - x, dy = n.y - y; if (dx * dx + dy * dy < r2) return false; }
+    const container = document.getElementById('atom-viewer');
+    if (container._resizeHandler) {
+        window.removeEventListener('resize', container._resizeHandler);
+        container._resizeHandler = null;
     }
-    return true;
-  }
-  for (let s = 0; s < 18; s++) ins({ x: Math.random() * width, y: Math.random() * height });
-  while (act.length && pts.length < count) {
-    const ri = (Math.random() * act.length) | 0, p = act[ri];
-    let found = false;
-    for (let n = 0; n < k; n++) {
-      const a = Math.random() * 6.2832, m = radius * (1 + Math.random());
-      const x = p.x + Math.cos(a) * m, y = p.y + Math.sin(a) * m;
-      if (x >= 0 && y >= 0 && x < width && y < height && far(x, y)) { ins({ x, y }); found = true; break; }
+
+    // Dispose GPU resources — traverse scene to free geometries and materials
+    if (scene) {
+        scene.traverse(obj => {
+            if (obj.geometry) obj.geometry.dispose();
+            if (obj.material) {
+                if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose());
+                else obj.material.dispose();
+            }
+        });
     }
-    if (!found) act.splice(ri, 1);
-  }
-  self.postMessage(pts);
-};
-`;
 
-function _generateParticles() {
-  try {
-    _particlesReady = false;
-    const blob = new Blob([_WORKER_SRC2], { type: 'text/javascript' });
-    const wrk = new Worker(URL.createObjectURL(blob));
-    wrk.postMessage({ width: innerWidth, height: innerHeight, radius: 100, count: _INITIAL_COUNT });
-    wrk.onmessage = e => {
-      const pts = e.data;
-      _particles = [];
-      for (let i = 0; i < pts.length && i < _INITIAL_COUNT; i++)
-        _particles.push(new _AParticle(pts[i].x, pts[i].y, i % _SYMBOLS.length));
-      _particlesReady = true;
-      wrk.terminate();
-    };
-  } catch(e) {
-    console.error('Particle Worker error:', e);
-    _particlesReady = true; // fallback so page still works
-  }
+    const canvas = container.querySelector('canvas');
+    if (canvas) canvas.remove();
+
+    if (renderer) {
+        renderer.dispose();
+        renderer = null;
+    }
+    scene = null;
+    camera = null;
+    atomGroup = null;
 }
-
-_generateParticles();
-requestAnimationFrame(_animate);
-
-function refreshParticleColors() {}
-
-
-/* ═══════════════════════════════════════════════════════════════════════
-   INITIALIZATION
-═══════════════════════════════════════════════════════════════════════ */
-applyTheme();
-applyLanguage();
-LiquidGlassEngine.init();

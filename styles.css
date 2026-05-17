@@ -401,8 +401,13 @@ html::before {
     align-items: center;
     justify-content: center;
     transition: background var(--theme-speed) ease;
+    border: none;
+    padding: 0;
+    max-width: 100vw;
+    max-height: 100vh;
 }
-.overlay.active {
+.overlay.active,
+.overlay[open] {
     display: flex;
     animation: fadeIn 0.3s ease;
 }

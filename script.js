@@ -6,17 +6,20 @@ const root = document.documentElement;
 
 const savedTheme = localStorage.getItem('pt-theme');
 if (savedTheme) root.setAttribute('data-theme', savedTheme);
+themeToggle.setAttribute('aria-pressed', root.getAttribute('data-theme') === 'dark');
 
 themeToggle.addEventListener('click', () => {
     const dark = root.getAttribute('data-theme') === 'dark';
     root.setAttribute('data-theme', dark ? 'light' : 'dark');
     localStorage.setItem('pt-theme', dark ? 'light' : 'dark');
+    themeToggle.setAttribute('aria-pressed', !dark);
 });
 
 /* ============================================================
    I18N — INTERNATIONALIZATION
    ============================================================ */
 let currentLang = localStorage.getItem('pt-lang') || 'en';
+root.setAttribute('lang', currentLang);
 
 const I18N = {
     en: {
@@ -391,6 +394,9 @@ themeObserver.observe(root, { attributes: true, attributeFilter: ['data-theme'] 
         cell.dataset.z = el.z;
         cell.style.gridRow = pos[0];
         cell.style.gridColumn = pos[1];
+        cell.setAttribute('role', 'gridcell');
+        cell.setAttribute('tabindex', '0');
+        cell.setAttribute('aria-label', `${getElementName(el.z)} - ${I18N[currentLang].elementPrefix} ${el.z}, ${el.sym}`);
         cell.innerHTML = `
             <span class="atomic-number">${el.z}</span>
             <span class="symbol">${el.sym}</span>
@@ -398,6 +404,7 @@ themeObserver.observe(root, { attributes: true, attributeFilter: ['data-theme'] 
             <span class="mass">${formatMass(el.mass, 2)}</span>
         `;
         cell.addEventListener('click', () => openDetail(el));
+        cell.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetail(el); } });
         table.appendChild(cell);
     }
 
@@ -476,6 +483,7 @@ function openDetail(el) {
     updateDetailText(el);
 
     overlay.classList.add('active');
+    if (overlay.showModal) overlay.showModal();
 
     $modeBohr.classList.toggle('active', viewMode === 'bohr');
     $modeOrbital.classList.toggle('active', viewMode === 'orbital');
@@ -485,6 +493,7 @@ function openDetail(el) {
 
 function closeDetail() {
     overlay.classList.remove('active');
+    if (overlay.close) overlay.close();
     destroyAtom();
     currentDetailEl = null;
 }
@@ -495,6 +504,14 @@ function closeDetail() {
 function switchLang(lang) {
     currentLang = lang;
     localStorage.setItem('pt-lang', lang);
+    document.documentElement.setAttribute('lang', lang);
+
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+        metaDesc.setAttribute('content', lang === 'zh'
+            ? '探索所有118种化学元素，支持3D原子模型、轨道可视化、中英双语切换和液态玻璃风格界面。'
+            : 'Explore all 118 chemical elements with an interactive periodic table featuring 3D atomic models, orbital visualization, bilingual support (English/Chinese), and a stunning liquid glass UI design.');
+    }
 
     $titleText.textContent = t('title');
     $langLabel.textContent = lang === 'en' ? 'EN' : '中';

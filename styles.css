@@ -122,8 +122,8 @@ html::before {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    padding: 24px;
-    gap: 20px;
+    padding: 16px 24px;
+    gap: 12px;
 }
 
 /* ============================================================
@@ -133,13 +133,14 @@ html::before {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px;
+    padding: 12px 20px;
+    gap: 16px;
 }
 .controls-right {
     display: flex;
     gap: 8px;
 }
-.header-text { text-align: center; }
+.header-text { text-align: center; flex-shrink: 0; }
 .header-text h1 {
     font-size: 2.4rem;
     font-weight: 700;
@@ -214,14 +215,14 @@ html::before {
     justify-content: center;
     flex-wrap: wrap;
     gap: 8px;
-    padding: 12px 20px;
+    padding: 8px 16px;
     background: var(--glass-bg);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    margin: 0 auto;
-    max-width: 1100px;
+    border-radius: 12px;
+    flex: 1;
+    min-width: 0;
     box-shadow: 0 1px 10px var(--glass-shadow), inset 0 1px 0 var(--glass-inner-highlight);
     transition: background var(--theme-speed) ease, border-color var(--theme-speed) ease, box-shadow var(--theme-speed) ease;
 }
@@ -248,11 +249,11 @@ html::before {
    ============================================================ */
 .table-wrapper {
     overflow-x: auto;
-    padding: 16px;
+    padding: 12px;
     background: var(--glass-bg-subtle);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-    border-radius: 24px;
+    border-radius: 20px;
     margin: 0 auto;
     max-width: 1400px;
     transition: background var(--theme-speed) ease, border-color var(--theme-speed) ease, box-shadow var(--theme-speed) ease;
@@ -628,6 +629,44 @@ html::before {
 }
 
 /* ============================================================
+   FOOTER
+   ============================================================ */
+.footer {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0 4px;
+}
+.github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease, background var(--theme-speed) ease, border-color var(--theme-speed) ease, color var(--theme-speed) ease;
+    box-shadow: 0 1px 8px var(--glass-shadow), inset 0 1px 0 var(--glass-inner-highlight);
+}
+.github-link:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 4px 16px var(--glass-shadow-heavy), inset 0 1px 0 var(--glass-inner-highlight);
+    color: var(--text-primary);
+}
+.github-link:active {
+    transform: translateY(0) scale(0.98);
+}
+.github-icon {
+    flex-shrink: 0;
+    transition: color var(--theme-speed) ease;
+}
+
+/* ============================================================
    SCROLLBAR (theme-aware)
    ============================================================ */
 .detail-info::-webkit-scrollbar { width: 6px; }
@@ -641,10 +680,11 @@ html::before {
    RESPONSIVE
    ============================================================ */
 @media (max-width: 768px) {
-    .app-container { padding: 12px; gap: 12px; }
-    .header { flex-wrap: wrap; gap: 12px; padding: 12px; }
+    .app-container { padding: 8px 12px; gap: 8px; }
+    .header { flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
     .controls-right { position: static; transform: none; }
-    .header-text h1 { font-size: 1.6rem; }
+    .header-text h1 { font-size: 1.4rem; }
+    .legend { order: 3; width: 100%; flex-basis: 100%; }
     .detail-body { flex-direction: column; }
     .atom-viewer { width: 100%; min-height: 250px; border-right: none; border-bottom: 1px solid var(--detail-header-border); }
     .detail-panel { border-radius: 20px; }

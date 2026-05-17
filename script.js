@@ -334,13 +334,14 @@ function renderLegend() {
 renderLegend();
 
 // Unified theme observer — updates isDark + legend swatches + meta theme-color
+const metaTheme = document.querySelector('meta[name="theme-color"]');
 const themeObserver = new MutationObserver(() => {
     isDark = root.getAttribute('data-theme') === 'dark';
     document.querySelectorAll('.legend-swatch').forEach(s => {
         s.style.background = isDark ? s.dataset.colorDark : s.dataset.colorLight;
     });
-    const metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) metaTheme.content = isDark ? '#0a0a14' : '#f8f9fd';
+    if (currentDetailEl) buildAtom(currentDetailEl);
 });
 themeObserver.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
 
@@ -628,11 +629,14 @@ function createSOrbital(radius, color, opacity, dark) {
     return group;
 }
 
+const _pOrbitalGeoCache = {};
 function createPOrbital(radius, color, opacity, dark, axis) {
     const group = new THREE.Group();
     const lobeSize = radius * 0.22;
     const offset = radius * 0.35;
-    const geo = new THREE.SphereGeometry(lobeSize, 24, 24);
+    const geoKey = `${lobeSize.toFixed(3)}_${24}`;
+    if (!_pOrbitalGeoCache[geoKey]) _pOrbitalGeoCache[geoKey] = new THREE.SphereGeometry(lobeSize, 24, 24);
+    const geo = _pOrbitalGeoCache[geoKey];
     const mat = new THREE.MeshPhongMaterial({
         color: color, emissive: color, emissiveIntensity: dark ? 0.35 : 0.25,
         transparent: true, opacity: opacity, side: THREE.DoubleSide, shininess: 40
@@ -737,7 +741,7 @@ function buildBohrContent(el, dark) {
                 isElectron: true,
                 radius: radius,
                 angle: angle,
-                speed: 0.4 + i * 0.2 + e * 0.01,
+                speed: 0.29 + i * 0.144 + e * 0.007,
                 shellIdx: i
             };
             atomGroup.add(pivot);
@@ -795,14 +799,7 @@ function animateBohrElectrons(nucleusGroup) {
 
     atomGroup.children.forEach(child => {
         if (child.userData && child.userData.isElectron) {
-            const d = child.userData;
-            const newAngle = d.angle + animTime * d.speed;
-            const mesh = child.children[0];
-            mesh.position.set(
-                d.radius * Math.cos(newAngle),
-                d.radius * Math.sin(newAngle),
-                0
-            );
+            child.rotation.z = animTime * child.userData.speed;
         }
     });
 }
@@ -827,14 +824,13 @@ function buildAtom(el) {
     const w = container.clientWidth || 320;
     const h = container.clientHeight || 300;
 
-    const orbitals = viewMode === 'orbital' ? parseElectronConfig(el.config) : [];
-    const maxN = orbitals.length > 0 ? Math.max(...orbitals.map(o => o.n)) : 1;
-
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera(50, w / h, 0.1, 100);
     let camZ;
     if (viewMode === 'orbital') {
+        const orbitals = parseElectronConfig(el.config);
+        const maxN = orbitals.length > 0 ? Math.max(...orbitals.map(o => o.n)) : 1;
         camZ = 12 + maxN * 1.2;
     } else {
         const numShells = el.shells.length;
@@ -979,13 +975,13 @@ function destroyAtom() {
         });
     }
 
-    const canvas = container.querySelector('canvas');
-    if (canvas) canvas.remove();
-
     if (renderer) {
         renderer.dispose();
         renderer = null;
     }
+
+    const canvas = container.querySelector('canvas');
+    if (canvas) canvas.remove();
     scene = null;
     camera = null;
     atomGroup = null;

@@ -752,8 +752,7 @@ function buildBohrContent(el, dark) {
 /* ============================================================
    BUILD ORBITAL CONTENT (s/p/d/f shapes)
    ============================================================ */
-function buildOrbitalContent(el, dark) {
-    const orbitals = parseElectronConfig(el.config);
+function buildOrbitalContent(el, dark, orbitals) {
     const maxN = Math.max(...orbitals.map(o => o.n));
 
     orbitals.forEach(orb => {
@@ -827,10 +826,10 @@ function buildAtom(el) {
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera(50, w / h, 0.1, 100);
+    const parsedOrbitals = viewMode === 'orbital' ? parseElectronConfig(el.config) : null;
     let camZ;
     if (viewMode === 'orbital') {
-        const orbitals = parseElectronConfig(el.config);
-        const maxN = orbitals.length > 0 ? Math.max(...orbitals.map(o => o.n)) : 1;
+        const maxN = parsedOrbitals.length > 0 ? Math.max(...parsedOrbitals.map(o => o.n)) : 1;
         camZ = 12 + maxN * 1.2;
     } else {
         const numShells = el.shells.length;
@@ -881,7 +880,7 @@ function buildAtom(el) {
     if (viewMode === 'bohr') {
         buildBohrContent(el, isDark);
     } else {
-        buildOrbitalContent(el, isDark);
+        buildOrbitalContent(el, isDark, parsedOrbitals);
     }
 
     // Drag controls — pointer events only (covers touch), with AbortController
@@ -973,6 +972,12 @@ function destroyAtom() {
                 else obj.material.dispose();
             }
         });
+    }
+
+    // Clear p-orbital geometry cache
+    for (const key in _pOrbitalGeoCache) {
+        _pOrbitalGeoCache[key].dispose();
+        delete _pOrbitalGeoCache[key];
     }
 
     if (renderer) {

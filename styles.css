@@ -66,7 +66,6 @@
     --glass-border-light: rgba(255,255,255,0.04);
     --glass-glow: rgba(255,255,255,0.02);
     --glass-inner-highlight: rgba(255,255,255,0.04);
-    --glass-inner-highlight-end: rgba(255,255,255,0.005);
     --glass-shadow: rgba(0,0,0,0.10);
     --glass-shadow-heavy: rgba(0,0,0,0.18);
 
@@ -104,6 +103,13 @@ html, body {
     -webkit-font-smoothing: antialiased;
     transition: color var(--theme-speed) ease;
 }
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 16px 24px;
+    gap: 12px;
+}
 html::before {
     content: '';
     position: fixed;
@@ -119,8 +125,7 @@ html::before {
 .app-container {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
-    padding: 16px 24px;
+    flex: 1;
     gap: 12px;
 }
 
@@ -292,7 +297,7 @@ html::before {
     border-radius: 20px;
     margin: 0 auto;
     max-width: 1400px;
-    transition: background var(--theme-speed) ease, border-color var(--theme-speed) ease, box-shadow var(--theme-speed) ease;
+    transition: background var(--theme-speed) ease, box-shadow var(--theme-speed) ease;
 }
 
 .periodic-table {
@@ -686,9 +691,9 @@ html::before {
    RESPONSIVE
    ============================================================ */
 @media (max-width: 768px) {
-    .app-container { padding: 8px 12px; gap: 8px; }
+    body { padding: 8px 12px; gap: 8px; }
+    .app-container { gap: 8px; }
     .header { flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
-    .controls-right { position: static; transform: none; }
     .header-text h1 { font-size: 1.4rem; }
     .legend { order: 3; width: 100%; flex-basis: 100%; }
     .detail-body { flex-direction: column; }

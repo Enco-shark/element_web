@@ -437,7 +437,11 @@ const $modeBohr = document.getElementById('mode-bohr');
 const $modeOrbital = document.getElementById('mode-orbital');
 
 closeBtn.addEventListener('click', closeDetail);
-overlay.addEventListener('click', e => { if (e.target === overlay) closeDetail(); });
+overlay.addEventListener('click', e => { if (e.target === overlay || e.target === overlay.dialog) closeDetail(); });
+overlay.addEventListener('mousedown', e => {
+    const rect = overlay.querySelector('.detail-panel').getBoundingClientRect();
+    if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) closeDetail();
+});
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
 
 let currentDetailEl = null;
@@ -455,7 +459,7 @@ function updateDetailText(el) {
     $detailInfo.innerHTML = '';
     const rows = [
         [t('atomicNumber'), el.z],
-        [t('atomicMass'), formatMass(el.mass, 3) + ' u'],
+        [t('atomicMass'), formatMass(el.mass, 2) + ' u'],
         [t('category'), getCategoryLabel(el.cat)],
         [t('yearDiscovered'), el.year === 0 ? t('ancient') : el.year],
     ];
@@ -822,6 +826,13 @@ function buildAtom(el) {
     const container = document.getElementById('atom-viewer');
     const w = container.clientWidth || 320;
     const h = container.clientHeight || 300;
+
+    const testCanvas = document.createElement('canvas');
+    const gl = testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl');
+    if (!gl) {
+        container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-secondary);font-size:0.8rem;">WebGL not supported</div>';
+        return;
+    }
 
     scene = new THREE.Scene();
 

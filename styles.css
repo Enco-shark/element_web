@@ -16,7 +16,6 @@
     --glass-border-light: rgba(255,255,255,0.10);
     --glass-glow: rgba(255,255,255,0.06);
     --glass-inner-highlight: rgba(255,255,255,0.12);
-    --glass-inner-highlight-end: rgba(255,255,255,0.01);
     --glass-shadow: rgba(0,0,0,0.02);
     --glass-shadow-heavy: rgba(0,0,0,0.04);
 
@@ -112,7 +111,6 @@ html::before {
     background: var(--bg-primary);
     z-index: -1;
     pointer-events: none;
-    transition: background var(--theme-speed) ease;
 }
 
 /* ============================================================
@@ -150,13 +148,13 @@ html::before {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    transition: background var(--theme-speed) ease;
 }
 /* ============================================================
    HEADER CONTROLS (shared)
    ============================================================ */
 .theme-toggle,
 .lang-toggle {
+    position: relative;
     width: 44px; height: 44px;
     border-radius: 50%;
     border: 1px solid var(--glass-border);

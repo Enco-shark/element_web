@@ -136,124 +136,124 @@ function getCategoryLabel(cat) { return I18N[currentLang].categories[cat] || cat
    ELEMENT DATA — ALL 118 ELEMENTS
    ============================================================ */
 const ELEMENTS = [
-    { z:1, sym:"H", name:"Hydrogen", mass:1.008, cat:"nonmetal", year:1766, config:"1s1", shells:[1] },
-    { z:2, sym:"He", name:"Helium", mass:4.003, cat:"noble-gas", year:1868, config:"1s2", shells:[2] },
-    { z:3, sym:"Li", name:"Lithium", mass:6.941, cat:"alkali-metal", year:1817, config:"[He]2s1", shells:[2,1] },
-    { z:4, sym:"Be", name:"Beryllium", mass:9.012, cat:"alkaline-earth-metal", year:1798, config:"[He]2s2", shells:[2,2] },
-    { z:5, sym:"B", name:"Boron", mass:10.81, cat:"metalloid", year:1808, config:"[He]2s2 2p1", shells:[2,3] },
-    { z:6, sym:"C", name:"Carbon", mass:12.01, cat:"nonmetal", year:0, config:"[He]2s2 2p2", shells:[2,4] },
-    { z:7, sym:"N", name:"Nitrogen", mass:14.01, cat:"nonmetal", year:1772, config:"[He]2s2 2p3", shells:[2,5] },
-    { z:8, sym:"O", name:"Oxygen", mass:16.00, cat:"nonmetal", year:1774, config:"[He]2s2 2p4", shells:[2,6] },
-    { z:9, sym:"F", name:"Fluorine", mass:19.00, cat:"halogen", year:1886, config:"[He]2s2 2p5", shells:[2,7] },
-    { z:10, sym:"Ne", name:"Neon", mass:20.18, cat:"noble-gas", year:1898, config:"[He]2s2 2p6", shells:[2,8] },
-    { z:11, sym:"Na", name:"Sodium", mass:22.99, cat:"alkali-metal", year:1807, config:"[Ne]3s1", shells:[2,8,1] },
-    { z:12, sym:"Mg", name:"Magnesium", mass:24.31, cat:"alkaline-earth-metal", year:1755, config:"[Ne]3s2", shells:[2,8,2] },
-    { z:13, sym:"Al", name:"Aluminium", mass:26.98, cat:"post-transition-metal", year:1825, config:"[Ne]3s2 3p1", shells:[2,8,3] },
-    { z:14, sym:"Si", name:"Silicon", mass:28.09, cat:"metalloid", year:1824, config:"[Ne]3s2 3p2", shells:[2,8,4] },
-    { z:15, sym:"P", name:"Phosphorus", mass:30.97, cat:"nonmetal", year:1669, config:"[Ne]3s2 3p3", shells:[2,8,5] },
-    { z:16, sym:"S", name:"Sulfur", mass:32.07, cat:"nonmetal", year:0, config:"[Ne]3s2 3p4", shells:[2,8,6] },
-    { z:17, sym:"Cl", name:"Chlorine", mass:35.45, cat:"halogen", year:1774, config:"[Ne]3s2 3p5", shells:[2,8,7] },
-    { z:18, sym:"Ar", name:"Argon", mass:39.95, cat:"noble-gas", year:1894, config:"[Ne]3s2 3p6", shells:[2,8,8] },
-    { z:19, sym:"K", name:"Potassium", mass:39.10, cat:"alkali-metal", year:1807, config:"[Ar]4s1", shells:[2,8,8,1] },
-    { z:20, sym:"Ca", name:"Calcium", mass:40.08, cat:"alkaline-earth-metal", year:1808, config:"[Ar]4s2", shells:[2,8,8,2] },
-    { z:21, sym:"Sc", name:"Scandium", mass:44.96, cat:"transition-metal", year:1879, config:"[Ar]3d1 4s2", shells:[2,8,9,2] },
-    { z:22, sym:"Ti", name:"Titanium", mass:47.87, cat:"transition-metal", year:1791, config:"[Ar]3d2 4s2", shells:[2,8,10,2] },
-    { z:23, sym:"V", name:"Vanadium", mass:50.94, cat:"transition-metal", year:1801, config:"[Ar]3d3 4s2", shells:[2,8,11,2] },
-    { z:24, sym:"Cr", name:"Chromium", mass:52.00, cat:"transition-metal", year:1797, config:"[Ar]3d5 4s1", shells:[2,8,13,1] },
-    { z:25, sym:"Mn", name:"Manganese", mass:54.94, cat:"transition-metal", year:1774, config:"[Ar]3d5 4s2", shells:[2,8,13,2] },
-    { z:26, sym:"Fe", name:"Iron", mass:55.85, cat:"transition-metal", year:0, config:"[Ar]3d6 4s2", shells:[2,8,14,2] },
-    { z:27, sym:"Co", name:"Cobalt", mass:58.93, cat:"transition-metal", year:1735, config:"[Ar]3d7 4s2", shells:[2,8,15,2] },
-    { z:28, sym:"Ni", name:"Nickel", mass:58.69, cat:"transition-metal", year:1751, config:"[Ar]3d8 4s2", shells:[2,8,16,2] },
-    { z:29, sym:"Cu", name:"Copper", mass:63.55, cat:"transition-metal", year:0, config:"[Ar]3d10 4s1", shells:[2,8,18,1] },
-    { z:30, sym:"Zn", name:"Zinc", mass:65.38, cat:"transition-metal", year:0, config:"[Ar]3d10 4s2", shells:[2,8,18,2] },
-    { z:31, sym:"Ga", name:"Gallium", mass:69.72, cat:"post-transition-metal", year:1875, config:"[Ar]3d10 4s2 4p1", shells:[2,8,18,3] },
-    { z:32, sym:"Ge", name:"Germanium", mass:72.63, cat:"metalloid", year:1886, config:"[Ar]3d10 4s2 4p2", shells:[2,8,18,4] },
-    { z:33, sym:"As", name:"Arsenic", mass:74.92, cat:"metalloid", year:0, config:"[Ar]3d10 4s2 4p3", shells:[2,8,18,5] },
-    { z:34, sym:"Se", name:"Selenium", mass:78.97, cat:"nonmetal", year:1817, config:"[Ar]3d10 4s2 4p4", shells:[2,8,18,6] },
-    { z:35, sym:"Br", name:"Bromine", mass:79.90, cat:"halogen", year:1826, config:"[Ar]3d10 4s2 4p5", shells:[2,8,18,7] },
-    { z:36, sym:"Kr", name:"Krypton", mass:83.80, cat:"noble-gas", year:1898, config:"[Ar]3d10 4s2 4p6", shells:[2,8,18,8] },
-    { z:37, sym:"Rb", name:"Rubidium", mass:85.47, cat:"alkali-metal", year:1861, config:"[Kr]5s1", shells:[2,8,18,8,1] },
-    { z:38, sym:"Sr", name:"Strontium", mass:87.62, cat:"alkaline-earth-metal", year:1790, config:"[Kr]5s2", shells:[2,8,18,8,2] },
-    { z:39, sym:"Y", name:"Yttrium", mass:88.91, cat:"transition-metal", year:1794, config:"[Kr]4d1 5s2", shells:[2,8,18,9,2] },
-    { z:40, sym:"Zr", name:"Zirconium", mass:91.22, cat:"transition-metal", year:1789, config:"[Kr]4d2 5s2", shells:[2,8,18,10,2] },
-    { z:41, sym:"Nb", name:"Niobium", mass:92.91, cat:"transition-metal", year:1801, config:"[Kr]4d4 5s1", shells:[2,8,18,12,1] },
-    { z:42, sym:"Mo", name:"Molybdenum", mass:95.95, cat:"transition-metal", year:1781, config:"[Kr]4d5 5s1", shells:[2,8,18,13,1] },
-    { z:43, sym:"Tc", name:"Technetium", mass:98, cat:"transition-metal", year:1937, config:"[Kr]4d5 5s2", shells:[2,8,18,13,2] },
-    { z:44, sym:"Ru", name:"Ruthenium", mass:101.07, cat:"transition-metal", year:1844, config:"[Kr]4d7 5s1", shells:[2,8,18,15,1] },
-    { z:45, sym:"Rh", name:"Rhodium", mass:102.91, cat:"transition-metal", year:1803, config:"[Kr]4d8 5s1", shells:[2,8,18,16,1] },
-    { z:46, sym:"Pd", name:"Palladium", mass:106.42, cat:"transition-metal", year:1803, config:"[Kr]4d10", shells:[2,8,18,18] },
-    { z:47, sym:"Ag", name:"Silver", mass:107.87, cat:"transition-metal", year:0, config:"[Kr]4d10 5s1", shells:[2,8,18,18,1] },
-    { z:48, sym:"Cd", name:"Cadmium", mass:112.41, cat:"transition-metal", year:1817, config:"[Kr]4d10 5s2", shells:[2,8,18,18,2] },
-    { z:49, sym:"In", name:"Indium", mass:114.82, cat:"post-transition-metal", year:1863, config:"[Kr]4d10 5s2 5p1", shells:[2,8,18,18,3] },
-    { z:50, sym:"Sn", name:"Tin", mass:118.71, cat:"post-transition-metal", year:0, config:"[Kr]4d10 5s2 5p2", shells:[2,8,18,18,4] },
-    { z:51, sym:"Sb", name:"Antimony", mass:121.76, cat:"metalloid", year:0, config:"[Kr]4d10 5s2 5p3", shells:[2,8,18,18,5] },
-    { z:52, sym:"Te", name:"Tellurium", mass:127.60, cat:"metalloid", year:1783, config:"[Kr]4d10 5s2 5p4", shells:[2,8,18,18,6] },
-    { z:53, sym:"I", name:"Iodine", mass:126.90, cat:"halogen", year:1811, config:"[Kr]4d10 5s2 5p5", shells:[2,8,18,18,7] },
-    { z:54, sym:"Xe", name:"Xenon", mass:131.29, cat:"noble-gas", year:1898, config:"[Kr]4d10 5s2 5p6", shells:[2,8,18,18,8] },
-    { z:55, sym:"Cs", name:"Cesium", mass:132.91, cat:"alkali-metal", year:1860, config:"[Xe]6s1", shells:[2,8,18,18,8,1] },
-    { z:56, sym:"Ba", name:"Barium", mass:137.33, cat:"alkaline-earth-metal", year:1808, config:"[Xe]6s2", shells:[2,8,18,18,8,2] },
-    { z:57, sym:"La", name:"Lanthanum", mass:138.91, cat:"lanthanide", year:1839, config:"[Xe]5d1 6s2", shells:[2,8,18,18,9,2] },
-    { z:58, sym:"Ce", name:"Cerium", mass:140.12, cat:"lanthanide", year:1803, config:"[Xe]4f1 5d1 6s2", shells:[2,8,18,19,9,2] },
-    { z:59, sym:"Pr", name:"Praseodymium", mass:140.91, cat:"lanthanide", year:1885, config:"[Xe]4f3 6s2", shells:[2,8,18,21,8,2] },
-    { z:60, sym:"Nd", name:"Neodymium", mass:144.24, cat:"lanthanide", year:1885, config:"[Xe]4f4 6s2", shells:[2,8,18,22,8,2] },
-    { z:61, sym:"Pm", name:"Promethium", mass:145, cat:"lanthanide", year:1945, config:"[Xe]4f5 6s2", shells:[2,8,18,23,8,2] },
-    { z:62, sym:"Sm", name:"Samarium", mass:150.36, cat:"lanthanide", year:1879, config:"[Xe]4f6 6s2", shells:[2,8,18,24,8,2] },
-    { z:63, sym:"Eu", name:"Europium", mass:151.96, cat:"lanthanide", year:1901, config:"[Xe]4f7 6s2", shells:[2,8,18,25,8,2] },
-    { z:64, sym:"Gd", name:"Gadolinium", mass:157.25, cat:"lanthanide", year:1880, config:"[Xe]4f7 5d1 6s2", shells:[2,8,18,25,9,2] },
-    { z:65, sym:"Tb", name:"Terbium", mass:158.93, cat:"lanthanide", year:1843, config:"[Xe]4f9 6s2", shells:[2,8,18,27,8,2] },
-    { z:66, sym:"Dy", name:"Dysprosium", mass:162.50, cat:"lanthanide", year:1886, config:"[Xe]4f10 6s2", shells:[2,8,18,28,8,2] },
-    { z:67, sym:"Ho", name:"Holmium", mass:164.93, cat:"lanthanide", year:1878, config:"[Xe]4f11 6s2", shells:[2,8,18,29,8,2] },
-    { z:68, sym:"Er", name:"Erbium", mass:167.26, cat:"lanthanide", year:1843, config:"[Xe]4f12 6s2", shells:[2,8,18,30,8,2] },
-    { z:69, sym:"Tm", name:"Thulium", mass:168.93, cat:"lanthanide", year:1879, config:"[Xe]4f13 6s2", shells:[2,8,18,31,8,2] },
-    { z:70, sym:"Yb", name:"Ytterbium", mass:173.05, cat:"lanthanide", year:1878, config:"[Xe]4f14 6s2", shells:[2,8,18,32,8,2] },
-    { z:71, sym:"Lu", name:"Lutetium", mass:174.97, cat:"lanthanide", year:1907, config:"[Xe]4f14 5d1 6s2", shells:[2,8,18,32,9,2] },
-    { z:72, sym:"Hf", name:"Hafnium", mass:178.49, cat:"transition-metal", year:1923, config:"[Xe]4f14 5d2 6s2", shells:[2,8,18,32,10,2] },
-    { z:73, sym:"Ta", name:"Tantalum", mass:180.95, cat:"transition-metal", year:1802, config:"[Xe]4f14 5d3 6s2", shells:[2,8,18,32,11,2] },
-    { z:74, sym:"W", name:"Tungsten", mass:183.84, cat:"transition-metal", year:1783, config:"[Xe]4f14 5d4 6s2", shells:[2,8,18,32,12,2] },
-    { z:75, sym:"Re", name:"Rhenium", mass:186.21, cat:"transition-metal", year:1925, config:"[Xe]4f14 5d5 6s2", shells:[2,8,18,32,13,2] },
-    { z:76, sym:"Os", name:"Osmium", mass:190.23, cat:"transition-metal", year:1803, config:"[Xe]4f14 5d6 6s2", shells:[2,8,18,32,14,2] },
-    { z:77, sym:"Ir", name:"Iridium", mass:192.22, cat:"transition-metal", year:1803, config:"[Xe]4f14 5d7 6s2", shells:[2,8,18,32,15,2] },
-    { z:78, sym:"Pt", name:"Platinum", mass:195.08, cat:"transition-metal", year:1735, config:"[Xe]4f14 5d9 6s1", shells:[2,8,18,32,17,1] },
-    { z:79, sym:"Au", name:"Gold", mass:196.97, cat:"transition-metal", year:0, config:"[Xe]4f14 5d10 6s1", shells:[2,8,18,32,18,1] },
-    { z:80, sym:"Hg", name:"Mercury", mass:200.59, cat:"transition-metal", year:0, config:"[Xe]4f14 5d10 6s2", shells:[2,8,18,32,18,2] },
-    { z:81, sym:"Tl", name:"Thallium", mass:204.38, cat:"post-transition-metal", year:1861, config:"[Xe]4f14 5d10 6s2 6p1", shells:[2,8,18,32,18,3] },
-    { z:82, sym:"Pb", name:"Lead", mass:207.2, cat:"post-transition-metal", year:0, config:"[Xe]4f14 5d10 6s2 6p2", shells:[2,8,18,32,18,4] },
-    { z:83, sym:"Bi", name:"Bismuth", mass:208.98, cat:"post-transition-metal", year:1753, config:"[Xe]4f14 5d10 6s2 6p3", shells:[2,8,18,32,18,5] },
-    { z:84, sym:"Po", name:"Polonium", mass:209, cat:"post-transition-metal", year:1898, config:"[Xe]4f14 5d10 6s2 6p4", shells:[2,8,18,32,18,6] },
-    { z:85, sym:"At", name:"Astatine", mass:210, cat:"halogen", year:1940, config:"[Xe]4f14 5d10 6s2 6p5", shells:[2,8,18,32,18,7] },
-    { z:86, sym:"Rn", name:"Radon", mass:222, cat:"noble-gas", year:1900, config:"[Xe]4f14 5d10 6s2 6p6", shells:[2,8,18,32,18,8] },
-    { z:87, sym:"Fr", name:"Francium", mass:223, cat:"alkali-metal", year:1939, config:"[Rn]7s1", shells:[2,8,18,32,18,8,1] },
-    { z:88, sym:"Ra", name:"Radium", mass:226, cat:"alkaline-earth-metal", year:1898, config:"[Rn]7s2", shells:[2,8,18,32,18,8,2] },
-    { z:89, sym:"Ac", name:"Actinium", mass:227, cat:"actinide", year:1899, config:"[Rn]6d1 7s2", shells:[2,8,18,32,18,9,2] },
-    { z:90, sym:"Th", name:"Thorium", mass:232.04, cat:"actinide", year:1829, config:"[Rn]6d2 7s2", shells:[2,8,18,32,18,10,2] },
-    { z:91, sym:"Pa", name:"Protactinium", mass:231.04, cat:"actinide", year:1913, config:"[Rn]5f2 6d1 7s2", shells:[2,8,18,32,20,9,2] },
-    { z:92, sym:"U", name:"Uranium", mass:238.03, cat:"actinide", year:1789, config:"[Rn]5f3 6d1 7s2", shells:[2,8,18,32,21,9,2] },
-    { z:93, sym:"Np", name:"Neptunium", mass:237, cat:"actinide", year:1940, config:"[Rn]5f4 6d1 7s2", shells:[2,8,18,32,22,9,2] },
-    { z:94, sym:"Pu", name:"Plutonium", mass:244, cat:"actinide", year:1940, config:"[Rn]5f6 7s2", shells:[2,8,18,32,24,8,2] },
-    { z:95, sym:"Am", name:"Americium", mass:243, cat:"actinide", year:1944, config:"[Rn]5f7 7s2", shells:[2,8,18,32,25,8,2] },
-    { z:96, sym:"Cm", name:"Curium", mass:247, cat:"actinide", year:1944, config:"[Rn]5f7 6d1 7s2", shells:[2,8,18,32,25,9,2] },
-    { z:97, sym:"Bk", name:"Berkelium", mass:247, cat:"actinide", year:1949, config:"[Rn]5f9 7s2", shells:[2,8,18,32,27,8,2] },
-    { z:98, sym:"Cf", name:"Californium", mass:251, cat:"actinide", year:1950, config:"[Rn]5f10 7s2", shells:[2,8,18,32,28,8,2] },
-    { z:99, sym:"Es", name:"Einsteinium", mass:252, cat:"actinide", year:1952, config:"[Rn]5f11 7s2", shells:[2,8,18,32,29,8,2] },
-    { z:100, sym:"Fm", name:"Fermium", mass:257, cat:"actinide", year:1952, config:"[Rn]5f12 7s2", shells:[2,8,18,32,30,8,2] },
-    { z:101, sym:"Md", name:"Mendelevium", mass:258, cat:"actinide", year:1955, config:"[Rn]5f13 7s2", shells:[2,8,18,32,31,8,2] },
-    { z:102, sym:"No", name:"Nobelium", mass:259, cat:"actinide", year:1958, config:"[Rn]5f14 7s2", shells:[2,8,18,32,32,8,2] },
-    { z:103, sym:"Lr", name:"Lawrencium", mass:266, cat:"actinide", year:1961, config:"[Rn]5f14 7s2 7p1", shells:[2,8,18,32,32,8,3] },
-    { z:104, sym:"Rf", name:"Rutherfordium", mass:267, cat:"transition-metal", year:1969, config:"[Rn]5f14 6d2 7s2", shells:[2,8,18,32,32,10,2] },
-    { z:105, sym:"Db", name:"Dubnium", mass:268, cat:"transition-metal", year:1970, config:"[Rn]5f14 6d3 7s2", shells:[2,8,18,32,32,11,2] },
-    { z:106, sym:"Sg", name:"Seaborgium", mass:269, cat:"transition-metal", year:1974, config:"[Rn]5f14 6d4 7s2", shells:[2,8,18,32,32,12,2] },
-    { z:107, sym:"Bh", name:"Bohrium", mass:270, cat:"transition-metal", year:1981, config:"[Rn]5f14 6d5 7s2", shells:[2,8,18,32,32,13,2] },
-    { z:108, sym:"Hs", name:"Hassium", mass:277, cat:"transition-metal", year:1984, config:"[Rn]5f14 6d6 7s2", shells:[2,8,18,32,32,14,2] },
-    { z:109, sym:"Mt", name:"Meitnerium", mass:278, cat:"transition-metal", year:1982, config:"[Rn]5f14 6d7 7s2", shells:[2,8,18,32,32,15,2] },
-    { z:110, sym:"Ds", name:"Darmstadtium", mass:281, cat:"transition-metal", year:1994, config:"[Rn]5f14 6d8 7s2", shells:[2,8,18,32,32,16,2] },
-    { z:111, sym:"Rg", name:"Roentgenium", mass:282, cat:"transition-metal", year:1994, config:"[Rn]5f14 6d9 7s2", shells:[2,8,18,32,32,17,2] },
-    { z:112, sym:"Cn", name:"Copernicium", mass:285, cat:"transition-metal", year:1996, config:"[Rn]5f14 6d10 7s2", shells:[2,8,18,32,32,18,2] },
-    { z:113, sym:"Nh", name:"Nihonium", mass:286, cat:"post-transition-metal", year:2003, config:"[Rn]5f14 6d10 7s2 7p1", shells:[2,8,18,32,32,18,3] },
-    { z:114, sym:"Fl", name:"Flerovium", mass:289, cat:"post-transition-metal", year:1999, config:"[Rn]5f14 6d10 7s2 7p2", shells:[2,8,18,32,32,18,4] },
-    { z:115, sym:"Mc", name:"Moscovium", mass:290, cat:"post-transition-metal", year:2003, config:"[Rn]5f14 6d10 7s2 7p3", shells:[2,8,18,32,32,18,5] },
-    { z:116, sym:"Lv", name:"Livermorium", mass:293, cat:"post-transition-metal", year:2000, config:"[Rn]5f14 6d10 7s2 7p4", shells:[2,8,18,32,32,18,6] },
-    { z:117, sym:"Ts", name:"Tennessine", mass:294, cat:"halogen", year:2010, config:"[Rn]5f14 6d10 7s2 7p5", shells:[2,8,18,32,32,18,7] },
-    { z:118, sym:"Og", name:"Oganesson", mass:294, cat:"noble-gas", year:2006, config:"[Rn]5f14 6d10 7s2 7p6", shells:[2,8,18,32,32,18,8] }
+    { z:1, sym:"H", mass:1.008, cat:"nonmetal", year:1766, config:"1s1", shells:[1] },
+    { z:2, sym:"He", mass:4.003, cat:"noble-gas", year:1868, config:"1s2", shells:[2] },
+    { z:3, sym:"Li", mass:6.941, cat:"alkali-metal", year:1817, config:"[He]2s1", shells:[2,1] },
+    { z:4, sym:"Be", mass:9.012, cat:"alkaline-earth-metal", year:1798, config:"[He]2s2", shells:[2,2] },
+    { z:5, sym:"B", mass:10.81, cat:"metalloid", year:1808, config:"[He]2s2 2p1", shells:[2,3] },
+    { z:6, sym:"C", mass:12.01, cat:"nonmetal", year:0, config:"[He]2s2 2p2", shells:[2,4] },
+    { z:7, sym:"N", mass:14.01, cat:"nonmetal", year:1772, config:"[He]2s2 2p3", shells:[2,5] },
+    { z:8, sym:"O", mass:16.00, cat:"nonmetal", year:1774, config:"[He]2s2 2p4", shells:[2,6] },
+    { z:9, sym:"F", mass:19.00, cat:"halogen", year:1886, config:"[He]2s2 2p5", shells:[2,7] },
+    { z:10, sym:"Ne", mass:20.18, cat:"noble-gas", year:1898, config:"[He]2s2 2p6", shells:[2,8] },
+    { z:11, sym:"Na", mass:22.99, cat:"alkali-metal", year:1807, config:"[Ne]3s1", shells:[2,8,1] },
+    { z:12, sym:"Mg", mass:24.31, cat:"alkaline-earth-metal", year:1755, config:"[Ne]3s2", shells:[2,8,2] },
+    { z:13, sym:"Al", mass:26.98, cat:"post-transition-metal", year:1825, config:"[Ne]3s2 3p1", shells:[2,8,3] },
+    { z:14, sym:"Si", mass:28.09, cat:"metalloid", year:1824, config:"[Ne]3s2 3p2", shells:[2,8,4] },
+    { z:15, sym:"P", mass:30.97, cat:"nonmetal", year:1669, config:"[Ne]3s2 3p3", shells:[2,8,5] },
+    { z:16, sym:"S", mass:32.07, cat:"nonmetal", year:0, config:"[Ne]3s2 3p4", shells:[2,8,6] },
+    { z:17, sym:"Cl", mass:35.45, cat:"halogen", year:1774, config:"[Ne]3s2 3p5", shells:[2,8,7] },
+    { z:18, sym:"Ar", mass:39.95, cat:"noble-gas", year:1894, config:"[Ne]3s2 3p6", shells:[2,8,8] },
+    { z:19, sym:"K", mass:39.10, cat:"alkali-metal", year:1807, config:"[Ar]4s1", shells:[2,8,8,1] },
+    { z:20, sym:"Ca", mass:40.08, cat:"alkaline-earth-metal", year:1808, config:"[Ar]4s2", shells:[2,8,8,2] },
+    { z:21, sym:"Sc", mass:44.96, cat:"transition-metal", year:1879, config:"[Ar]3d1 4s2", shells:[2,8,9,2] },
+    { z:22, sym:"Ti", mass:47.87, cat:"transition-metal", year:1791, config:"[Ar]3d2 4s2", shells:[2,8,10,2] },
+    { z:23, sym:"V", mass:50.94, cat:"transition-metal", year:1801, config:"[Ar]3d3 4s2", shells:[2,8,11,2] },
+    { z:24, sym:"Cr", mass:52.00, cat:"transition-metal", year:1797, config:"[Ar]3d5 4s1", shells:[2,8,13,1] },
+    { z:25, sym:"Mn", mass:54.94, cat:"transition-metal", year:1774, config:"[Ar]3d5 4s2", shells:[2,8,13,2] },
+    { z:26, sym:"Fe", mass:55.85, cat:"transition-metal", year:0, config:"[Ar]3d6 4s2", shells:[2,8,14,2] },
+    { z:27, sym:"Co", mass:58.93, cat:"transition-metal", year:1735, config:"[Ar]3d7 4s2", shells:[2,8,15,2] },
+    { z:28, sym:"Ni", mass:58.69, cat:"transition-metal", year:1751, config:"[Ar]3d8 4s2", shells:[2,8,16,2] },
+    { z:29, sym:"Cu", mass:63.55, cat:"transition-metal", year:0, config:"[Ar]3d10 4s1", shells:[2,8,18,1] },
+    { z:30, sym:"Zn", mass:65.38, cat:"transition-metal", year:0, config:"[Ar]3d10 4s2", shells:[2,8,18,2] },
+    { z:31, sym:"Ga", mass:69.72, cat:"post-transition-metal", year:1875, config:"[Ar]3d10 4s2 4p1", shells:[2,8,18,3] },
+    { z:32, sym:"Ge", mass:72.63, cat:"metalloid", year:1886, config:"[Ar]3d10 4s2 4p2", shells:[2,8,18,4] },
+    { z:33, sym:"As", mass:74.92, cat:"metalloid", year:0, config:"[Ar]3d10 4s2 4p3", shells:[2,8,18,5] },
+    { z:34, sym:"Se", mass:78.97, cat:"nonmetal", year:1817, config:"[Ar]3d10 4s2 4p4", shells:[2,8,18,6] },
+    { z:35, sym:"Br", mass:79.90, cat:"halogen", year:1826, config:"[Ar]3d10 4s2 4p5", shells:[2,8,18,7] },
+    { z:36, sym:"Kr", mass:83.80, cat:"noble-gas", year:1898, config:"[Ar]3d10 4s2 4p6", shells:[2,8,18,8] },
+    { z:37, sym:"Rb", mass:85.47, cat:"alkali-metal", year:1861, config:"[Kr]5s1", shells:[2,8,18,8,1] },
+    { z:38, sym:"Sr", mass:87.62, cat:"alkaline-earth-metal", year:1790, config:"[Kr]5s2", shells:[2,8,18,8,2] },
+    { z:39, sym:"Y", mass:88.91, cat:"transition-metal", year:1794, config:"[Kr]4d1 5s2", shells:[2,8,18,9,2] },
+    { z:40, sym:"Zr", mass:91.22, cat:"transition-metal", year:1789, config:"[Kr]4d2 5s2", shells:[2,8,18,10,2] },
+    { z:41, sym:"Nb", mass:92.91, cat:"transition-metal", year:1801, config:"[Kr]4d4 5s1", shells:[2,8,18,12,1] },
+    { z:42, sym:"Mo", mass:95.95, cat:"transition-metal", year:1781, config:"[Kr]4d5 5s1", shells:[2,8,18,13,1] },
+    { z:43, sym:"Tc", mass:98, cat:"transition-metal", year:1937, config:"[Kr]4d5 5s2", shells:[2,8,18,13,2] },
+    { z:44, sym:"Ru", mass:101.07, cat:"transition-metal", year:1844, config:"[Kr]4d7 5s1", shells:[2,8,18,15,1] },
+    { z:45, sym:"Rh", mass:102.91, cat:"transition-metal", year:1803, config:"[Kr]4d8 5s1", shells:[2,8,18,16,1] },
+    { z:46, sym:"Pd", mass:106.42, cat:"transition-metal", year:1803, config:"[Kr]4d10", shells:[2,8,18,18] },
+    { z:47, sym:"Ag", mass:107.87, cat:"transition-metal", year:0, config:"[Kr]4d10 5s1", shells:[2,8,18,18,1] },
+    { z:48, sym:"Cd", mass:112.41, cat:"transition-metal", year:1817, config:"[Kr]4d10 5s2", shells:[2,8,18,18,2] },
+    { z:49, sym:"In", mass:114.82, cat:"post-transition-metal", year:1863, config:"[Kr]4d10 5s2 5p1", shells:[2,8,18,18,3] },
+    { z:50, sym:"Sn", mass:118.71, cat:"post-transition-metal", year:0, config:"[Kr]4d10 5s2 5p2", shells:[2,8,18,18,4] },
+    { z:51, sym:"Sb", mass:121.76, cat:"metalloid", year:0, config:"[Kr]4d10 5s2 5p3", shells:[2,8,18,18,5] },
+    { z:52, sym:"Te", mass:127.60, cat:"metalloid", year:1783, config:"[Kr]4d10 5s2 5p4", shells:[2,8,18,18,6] },
+    { z:53, sym:"I", mass:126.90, cat:"halogen", year:1811, config:"[Kr]4d10 5s2 5p5", shells:[2,8,18,18,7] },
+    { z:54, sym:"Xe", mass:131.29, cat:"noble-gas", year:1898, config:"[Kr]4d10 5s2 5p6", shells:[2,8,18,18,8] },
+    { z:55, sym:"Cs", mass:132.91, cat:"alkali-metal", year:1860, config:"[Xe]6s1", shells:[2,8,18,18,8,1] },
+    { z:56, sym:"Ba", mass:137.33, cat:"alkaline-earth-metal", year:1808, config:"[Xe]6s2", shells:[2,8,18,18,8,2] },
+    { z:57, sym:"La", mass:138.91, cat:"lanthanide", year:1839, config:"[Xe]5d1 6s2", shells:[2,8,18,18,9,2] },
+    { z:58, sym:"Ce", mass:140.12, cat:"lanthanide", year:1803, config:"[Xe]4f1 5d1 6s2", shells:[2,8,18,19,9,2] },
+    { z:59, sym:"Pr", mass:140.91, cat:"lanthanide", year:1885, config:"[Xe]4f3 6s2", shells:[2,8,18,21,8,2] },
+    { z:60, sym:"Nd", mass:144.24, cat:"lanthanide", year:1885, config:"[Xe]4f4 6s2", shells:[2,8,18,22,8,2] },
+    { z:61, sym:"Pm", mass:145, cat:"lanthanide", year:1945, config:"[Xe]4f5 6s2", shells:[2,8,18,23,8,2] },
+    { z:62, sym:"Sm", mass:150.36, cat:"lanthanide", year:1879, config:"[Xe]4f6 6s2", shells:[2,8,18,24,8,2] },
+    { z:63, sym:"Eu", mass:151.96, cat:"lanthanide", year:1901, config:"[Xe]4f7 6s2", shells:[2,8,18,25,8,2] },
+    { z:64, sym:"Gd", mass:157.25, cat:"lanthanide", year:1880, config:"[Xe]4f7 5d1 6s2", shells:[2,8,18,25,9,2] },
+    { z:65, sym:"Tb", mass:158.93, cat:"lanthanide", year:1843, config:"[Xe]4f9 6s2", shells:[2,8,18,27,8,2] },
+    { z:66, sym:"Dy", mass:162.50, cat:"lanthanide", year:1886, config:"[Xe]4f10 6s2", shells:[2,8,18,28,8,2] },
+    { z:67, sym:"Ho", mass:164.93, cat:"lanthanide", year:1878, config:"[Xe]4f11 6s2", shells:[2,8,18,29,8,2] },
+    { z:68, sym:"Er", mass:167.26, cat:"lanthanide", year:1843, config:"[Xe]4f12 6s2", shells:[2,8,18,30,8,2] },
+    { z:69, sym:"Tm", mass:168.93, cat:"lanthanide", year:1879, config:"[Xe]4f13 6s2", shells:[2,8,18,31,8,2] },
+    { z:70, sym:"Yb", mass:173.05, cat:"lanthanide", year:1878, config:"[Xe]4f14 6s2", shells:[2,8,18,32,8,2] },
+    { z:71, sym:"Lu", mass:174.97, cat:"lanthanide", year:1907, config:"[Xe]4f14 5d1 6s2", shells:[2,8,18,32,9,2] },
+    { z:72, sym:"Hf", mass:178.49, cat:"transition-metal", year:1923, config:"[Xe]4f14 5d2 6s2", shells:[2,8,18,32,10,2] },
+    { z:73, sym:"Ta", mass:180.95, cat:"transition-metal", year:1802, config:"[Xe]4f14 5d3 6s2", shells:[2,8,18,32,11,2] },
+    { z:74, sym:"W", mass:183.84, cat:"transition-metal", year:1783, config:"[Xe]4f14 5d4 6s2", shells:[2,8,18,32,12,2] },
+    { z:75, sym:"Re", mass:186.21, cat:"transition-metal", year:1925, config:"[Xe]4f14 5d5 6s2", shells:[2,8,18,32,13,2] },
+    { z:76, sym:"Os", mass:190.23, cat:"transition-metal", year:1803, config:"[Xe]4f14 5d6 6s2", shells:[2,8,18,32,14,2] },
+    { z:77, sym:"Ir", mass:192.22, cat:"transition-metal", year:1803, config:"[Xe]4f14 5d7 6s2", shells:[2,8,18,32,15,2] },
+    { z:78, sym:"Pt", mass:195.08, cat:"transition-metal", year:1735, config:"[Xe]4f14 5d9 6s1", shells:[2,8,18,32,17,1] },
+    { z:79, sym:"Au", mass:196.97, cat:"transition-metal", year:0, config:"[Xe]4f14 5d10 6s1", shells:[2,8,18,32,18,1] },
+    { z:80, sym:"Hg", mass:200.59, cat:"transition-metal", year:0, config:"[Xe]4f14 5d10 6s2", shells:[2,8,18,32,18,2] },
+    { z:81, sym:"Tl", mass:204.38, cat:"post-transition-metal", year:1861, config:"[Xe]4f14 5d10 6s2 6p1", shells:[2,8,18,32,18,3] },
+    { z:82, sym:"Pb", mass:207.2, cat:"post-transition-metal", year:0, config:"[Xe]4f14 5d10 6s2 6p2", shells:[2,8,18,32,18,4] },
+    { z:83, sym:"Bi", mass:208.98, cat:"post-transition-metal", year:1753, config:"[Xe]4f14 5d10 6s2 6p3", shells:[2,8,18,32,18,5] },
+    { z:84, sym:"Po", mass:209, cat:"post-transition-metal", year:1898, config:"[Xe]4f14 5d10 6s2 6p4", shells:[2,8,18,32,18,6] },
+    { z:85, sym:"At", mass:210, cat:"halogen", year:1940, config:"[Xe]4f14 5d10 6s2 6p5", shells:[2,8,18,32,18,7] },
+    { z:86, sym:"Rn", mass:222, cat:"noble-gas", year:1900, config:"[Xe]4f14 5d10 6s2 6p6", shells:[2,8,18,32,18,8] },
+    { z:87, sym:"Fr", mass:223, cat:"alkali-metal", year:1939, config:"[Rn]7s1", shells:[2,8,18,32,18,8,1] },
+    { z:88, sym:"Ra", mass:226, cat:"alkaline-earth-metal", year:1898, config:"[Rn]7s2", shells:[2,8,18,32,18,8,2] },
+    { z:89, sym:"Ac", mass:227, cat:"actinide", year:1899, config:"[Rn]6d1 7s2", shells:[2,8,18,32,18,9,2] },
+    { z:90, sym:"Th", mass:232.04, cat:"actinide", year:1829, config:"[Rn]6d2 7s2", shells:[2,8,18,32,18,10,2] },
+    { z:91, sym:"Pa", mass:231.04, cat:"actinide", year:1913, config:"[Rn]5f2 6d1 7s2", shells:[2,8,18,32,20,9,2] },
+    { z:92, sym:"U", mass:238.03, cat:"actinide", year:1789, config:"[Rn]5f3 6d1 7s2", shells:[2,8,18,32,21,9,2] },
+    { z:93, sym:"Np", mass:237, cat:"actinide", year:1940, config:"[Rn]5f4 6d1 7s2", shells:[2,8,18,32,22,9,2] },
+    { z:94, sym:"Pu", mass:244, cat:"actinide", year:1940, config:"[Rn]5f6 7s2", shells:[2,8,18,32,24,8,2] },
+    { z:95, sym:"Am", mass:243, cat:"actinide", year:1944, config:"[Rn]5f7 7s2", shells:[2,8,18,32,25,8,2] },
+    { z:96, sym:"Cm", mass:247, cat:"actinide", year:1944, config:"[Rn]5f7 6d1 7s2", shells:[2,8,18,32,25,9,2] },
+    { z:97, sym:"Bk", mass:247, cat:"actinide", year:1949, config:"[Rn]5f9 7s2", shells:[2,8,18,32,27,8,2] },
+    { z:98, sym:"Cf", mass:251, cat:"actinide", year:1950, config:"[Rn]5f10 7s2", shells:[2,8,18,32,28,8,2] },
+    { z:99, sym:"Es", mass:252, cat:"actinide", year:1952, config:"[Rn]5f11 7s2", shells:[2,8,18,32,29,8,2] },
+    { z:100, sym:"Fm", mass:257, cat:"actinide", year:1952, config:"[Rn]5f12 7s2", shells:[2,8,18,32,30,8,2] },
+    { z:101, sym:"Md", mass:258, cat:"actinide", year:1955, config:"[Rn]5f13 7s2", shells:[2,8,18,32,31,8,2] },
+    { z:102, sym:"No", mass:259, cat:"actinide", year:1958, config:"[Rn]5f14 7s2", shells:[2,8,18,32,32,8,2] },
+    { z:103, sym:"Lr", mass:266, cat:"actinide", year:1961, config:"[Rn]5f14 7s2 7p1", shells:[2,8,18,32,32,8,3] },
+    { z:104, sym:"Rf", mass:267, cat:"transition-metal", year:1969, config:"[Rn]5f14 6d2 7s2", shells:[2,8,18,32,32,10,2] },
+    { z:105, sym:"Db", mass:268, cat:"transition-metal", year:1970, config:"[Rn]5f14 6d3 7s2", shells:[2,8,18,32,32,11,2] },
+    { z:106, sym:"Sg", mass:269, cat:"transition-metal", year:1974, config:"[Rn]5f14 6d4 7s2", shells:[2,8,18,32,32,12,2] },
+    { z:107, sym:"Bh", mass:270, cat:"transition-metal", year:1981, config:"[Rn]5f14 6d5 7s2", shells:[2,8,18,32,32,13,2] },
+    { z:108, sym:"Hs", mass:277, cat:"transition-metal", year:1984, config:"[Rn]5f14 6d6 7s2", shells:[2,8,18,32,32,14,2] },
+    { z:109, sym:"Mt", mass:278, cat:"transition-metal", year:1982, config:"[Rn]5f14 6d7 7s2", shells:[2,8,18,32,32,15,2] },
+    { z:110, sym:"Ds", mass:281, cat:"transition-metal", year:1994, config:"[Rn]5f14 6d8 7s2", shells:[2,8,18,32,32,16,2] },
+    { z:111, sym:"Rg", mass:282, cat:"transition-metal", year:1994, config:"[Rn]5f14 6d9 7s2", shells:[2,8,18,32,32,17,2] },
+    { z:112, sym:"Cn", mass:285, cat:"transition-metal", year:1996, config:"[Rn]5f14 6d10 7s2", shells:[2,8,18,32,32,18,2] },
+    { z:113, sym:"Nh", mass:286, cat:"post-transition-metal", year:2003, config:"[Rn]5f14 6d10 7s2 7p1", shells:[2,8,18,32,32,18,3] },
+    { z:114, sym:"Fl", mass:289, cat:"post-transition-metal", year:1999, config:"[Rn]5f14 6d10 7s2 7p2", shells:[2,8,18,32,32,18,4] },
+    { z:115, sym:"Mc", mass:290, cat:"post-transition-metal", year:2003, config:"[Rn]5f14 6d10 7s2 7p3", shells:[2,8,18,32,32,18,5] },
+    { z:116, sym:"Lv", mass:293, cat:"post-transition-metal", year:2000, config:"[Rn]5f14 6d10 7s2 7p4", shells:[2,8,18,32,32,18,6] },
+    { z:117, sym:"Ts", mass:294, cat:"halogen", year:2010, config:"[Rn]5f14 6d10 7s2 7p5", shells:[2,8,18,32,32,18,7] },
+    { z:118, sym:"Og", mass:294, cat:"noble-gas", year:2006, config:"[Rn]5f14 6d10 7s2 7p6", shells:[2,8,18,32,32,18,8] }
 ];
 
 /* ============================================================
@@ -547,6 +547,7 @@ let atomGroup;
 let viewMode = 'bohr'; // 'bohr' | 'orbital'
 let abortController = null;
 let animTime = 0;
+let bohrElectrons = [];
 
 function switchViewMode(mode) {
     if (mode === viewMode) return;
@@ -703,6 +704,7 @@ function createFOrbital(radius, color, opacity, dark) {
 function buildBohrContent(el, dark) {
     const shells = el.shells;
     const shellColors = [0x4fc3f7, 0x7c83f5, 0xff6b9d, 0xffe066, 0x7ee8a2, 0xffaa5c, 0xce93d8];
+    const electronGeo = new THREE.SphereGeometry(0.07, 10, 10);
 
     shells.forEach((electronCount, i) => {
         const radius = 0.9 + i * 0.75;
@@ -719,7 +721,6 @@ function buildBohrContent(el, dark) {
         ring.rotation.y = rotY;
         atomGroup.add(ring);
 
-        const electronGeo = new THREE.SphereGeometry(0.07, 10, 10);
         const electronMat = new THREE.MeshPhongMaterial({
             color: color, emissive: color, emissiveIntensity: 0.4,
             shininess: 200
@@ -745,6 +746,7 @@ function buildBohrContent(el, dark) {
                 shellIdx: i
             };
             atomGroup.add(pivot);
+            bohrElectrons.push(pivot);
         }
     });
 }
@@ -796,19 +798,17 @@ function animateBohrElectrons(nucleusGroup) {
     nucleusGroup.rotation.y = animTime * 0.216;
     nucleusGroup.rotation.x = animTime * 0.144;
 
-    atomGroup.children.forEach(child => {
-        if (child.userData && child.userData.isElectron) {
-            child.rotation.z = animTime * child.userData.speed;
-        }
-    });
+    for (let i = 0; i < bohrElectrons.length; i++) {
+        const el = bohrElectrons[i];
+        el.rotation.z = animTime * el.userData.speed;
+    }
 }
 
 function animateOrbitals() {
-    const t = Date.now() * 0.001;
     atomGroup.children.forEach(child => {
         if (child.userData && child.userData.orbitalType) {
             const pulseSpeed = 0.8 + child.userData.n * 0.15;
-            child.scale.setScalar(1 + Math.sin(t * pulseSpeed) * 0.04);
+            child.scale.setScalar(1 + Math.sin(animTime * pulseSpeed) * 0.04);
         }
     });
 }
@@ -990,4 +990,5 @@ function destroyAtom() {
     scene = null;
     camera = null;
     atomGroup = null;
+    bohrElectrons = [];
 }

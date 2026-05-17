@@ -775,6 +775,8 @@ function buildOrbitalContent(el, dark) {
             case 'f':
                 shape = createFOrbital(r, color, opacity, dark);
                 break;
+            default:
+                break;
         }
 
         if (shape) {
@@ -788,8 +790,8 @@ function buildOrbitalContent(el, dark) {
    ANIMATION HELPERS
    ============================================================ */
 function animateBohrElectrons(nucleusGroup) {
-    nucleusGroup.rotation.y = animTime * 0.3;
-    nucleusGroup.rotation.x = animTime * 0.2;
+    nucleusGroup.rotation.y = animTime * 0.216;
+    nucleusGroup.rotation.x = animTime * 0.144;
 
     atomGroup.children.forEach(child => {
         if (child.userData && child.userData.isElectron) {
@@ -916,12 +918,16 @@ function buildAtom(el) {
         camera.position.z = Math.max(2, Math.min(30, camera.position.z + e.deltaY * 0.01));
     }, { signal, passive: false });
 
-    // Animation loop — match 1.html time accumulator
+    // Animation loop — time-based for consistent speed across refresh rates
     animTime = 0;
+    let lastTime = performance.now();
     function animate() {
         if (!scene) return;
         animId = requestAnimationFrame(animate);
-        animTime += 0.012;
+        const now = performance.now();
+        const dt = (now - lastTime) / 1000;
+        lastTime = now;
+        animTime += dt;
 
         if (viewMode === 'bohr') {
             animateBohrElectrons(nucleusGroup);
